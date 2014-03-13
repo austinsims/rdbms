@@ -8,36 +8,10 @@ import java.util.Set;
 
 // Phase 0.1.  All (yes, all) tokens must be separated by spaces, including commas and parens.
 public class SQLParser {
-	public static boolean validAttrName(String attr) {
-		Set<Character> alphaSet = new HashSet<Character>();
-		for (Character c : "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_".toCharArray())
-			alphaSet.add(c);
-		
-		Set<Character> numericSet = new HashSet<Character>();
-		for (Character c : "1234567890".toCharArray())
-			numericSet.add(c);
-		
-		Set<Character> alphanumericSet = new HashSet<Character>();
-		alphanumericSet.addAll(alphaSet);
-		alphanumericSet.addAll(numericSet);
-		
-		Set<Character> attrSet = new HashSet<Character>();
-		for (Character c : attr.toCharArray())
-			attrSet.add(c);
-		
-		return 
-				attr.length() <= 256 && // length <= 256
-				(alphanumericSet).containsAll(attrSet) && // is alphanumeric plus _
-				alphaSet.contains(attr.charAt(0)); // first char is alphanumeric
-	}
 	
 	private void validateAttrNameOrDie(String attr) throws InvalidSQLException {
-		if (!validAttrName(attr))
+		if (!Attribute.validName(attr))
 			throw new InvalidSQLException(attr + " is not a valid attribute name");
-	}
-	
-	private Attribute parseAttribute(Scanner in) {
-		
 	}
 	
 	public static int parse(String statement) throws InvalidSQLException {
@@ -50,7 +24,7 @@ public class SQLParser {
 					throw new InvalidSQLException("CREATE must be followed by TABLE.");
 				
 				// Initialize what we need to make a new table
-				List<Attribute> attributes = new LinkedList<Attribute>();
+				Attributes attributes = new Attributes();
 				
 				// Parse name
 				String tableName = tokens.next();
@@ -134,16 +108,15 @@ public class SQLParser {
 				}
 				
 				// Parse PRIMARY KEY ( attr1, attr2, ... )
-				// "PRIMARY KEY" already swallowed by attribute loop
+				// "PRIMARY KEY" already swallowed by attribute loop. still need to swallow the open paren
+				if (!tokens.next().equals("(")) throw new InvalidSQLException("PRIMARY KEY must be followed by parenthesized attribute list");
 				boolean hasNextPkAttr = true;
 				Attributes pk = new Attributes();
 				while (hasNextPkAttr) {
 					String pkAttrStr = tokens.next();
-					if (pk.contains(pkAttrStr)) throw new InvalidSQLException("The table already contains an attribute with the name " + pkAttrStr);
-					String pkAttrTypeStr = tokens.next();
-					
-					
-					Attribute pkAttr = new Attribute(pkAttrStr, pkAttrType);
+					if (!attributes.contains(pkAttrStr))
+						throw new InvalidSQLException("The attribute list " + attributes + " does not contain the proposed PK attribute " + pkAttrStr);
+					pk.add(attributes.get(pkAttrStr));
 					
 					switch (tokens.next()) {
 					case ",":
@@ -152,16 +125,60 @@ public class SQLParser {
 					case ")":
 						hasNextPkAttr = false;
 						break;
+					default:
+						throw new InvalidSQLException("Attributes within a PRIMARY KEY attribute list must be separated by commas");
 					}
 					
 				}
 				
-				// Parse FOREIGN KEY ( fk ) REFERENCES table ( attr ), ... 
-				
 				// Create Table object
 				Table newTable = new Table(tableName, attributes, pk);
+				Table.insertIntoDB(newTable);
+				
+				// TODO:  Figure out why it isn't catching  FOREIGN for the next token
+				System.out.println(tokens.next());
+				
+				// Optionally Parse FOREIGN KEY ( fk ) REFERENCES table ( attr ), ...
+				if (tokens.hasNext("FOREIGN")) {
+					
+					boolean hasNextFK = true;
+					while (hasNextFK) {
+						// Swallow FOREIGN KEY
+						tokens.next();
+						if (!tokens.next().equals("KEY")) throw new InvalidSQLException("FOREIGN must be followed by KEY");
+						String fkAttrName = tokens.next();
+						if (!tokens.next().equals(")")) throw new InvalidSQLException("FOREIGN KEY must specify one attribute followed by a ')'");
+						if (!tokens.next().equals("REFERENCES")) throw new InvalidSQLException("Invalid FOREIGN KEY expression");
+						String foreignTable = tokens.next();
+						if (!tokens.next().equals("(")) throw new InvalidSQLException("Invalid FOREIGN KEY expression");
+						String foreignAttr  = tokens.next();
+						
+						try {
+							newTable.addFK(fkAttrName, foreignTable, foreignAttr);
+						} catch (IntegrityException e) {
+							throw new InvalidSQLException("Got an integrity violation: " + e.getMessage());
+						}
+						
+						String tok = tokens.next();
+						switch (tok) {
+						case "),":
+							hasNextFK = true;
+							break;
+						case ")":
+							hasNextFK = false;
+							break;
+						}
+
+					}
+
+				}
+				
+				String tok = tokens.next();
+				if (!tok.equals(");")) throw new InvalidSQLException("Must close CREATE TABLE with ');'");
+				
 				System.out.println("Created new table successfully:");
 				System.out.println(newTable);
+				// TODO: Actually put the table into the database.
 				
 			}
 		} catch (InvalidSQLException e) {

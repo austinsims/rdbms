@@ -20,4 +20,11 @@ public class Attributes extends LinkedHashSet<Attribute> {
 		return false;
 	}
 	
+	public Attribute get(String attrName) {
+		for (Attribute a : this) 
+			if (a.getName().equals(attrName)) return a;
+		// TODO: Is this the best way to handle the situation?
+		throw new IllegalArgumentException("Does not contain " + attrName);
+	}
+	
 }

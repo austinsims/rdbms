@@ -12,19 +12,27 @@ public class SQLParserTest {
 	@Test
 	public void testBasicCreateTableSpacey() throws Exception {
 		try {
-			SQLParser.parse("CREATE TABLE climate ( city char(50) , temperature decimal );");
+			SQLParser.parse("CREATE TABLE climate ( ssn int , name char(50) , age int , PRIMARY KEY ( ssn ) );");
 		} catch (Exception e) {
 			throw e;			
 		}
 	}
 	
+	/**
+	 * Basic FK that references another table. 
+	 */
 	@Test
-	public void testValidAttrName() {
-		assertTrue(SQLParser.validAttrName("king_kong"));
-		assertFalse(SQLParser.validAttrName("1monkeys_"));
-		assertTrue(SQLParser.validAttrName("_"));
-		assertFalse(SQLParser.validAttrName("123"));
-		assertFalse(SQLParser.validAttrName("Hello world!"));
+	public void testFK() throws Exception {
+		SQLParser.parse("CREATE TABLE department ( name char(50) , PRIMARY KEY ( name ) );");
+		SQLParser.parse("CREATE TABLE faculty ( name char(50) , department char(50) , PRIMARY KEY ( name ) , FOREIGN KEY ( department ) REFERENCES department ( name ) );");  
+	}
+	
+	/**
+	 * Try to make a foreign key that references the same table 
+	 */
+	@Test
+	public void testSelfFK() throws Exception {
+		SQLParser.parse("CREATE TABLE employee ( ssn int , manager_ssn int , PRIMARY KEY ( ssn ) FOREIGN KEY ( manager_ssn ) REFERENCES employee ( ssn )");
 	}
 
 }

@@ -19,10 +19,13 @@ public class TableTest {
 				new Attribute("third", Attribute.Type.INT),
 		};
 		
-		List<Attribute> pk = new LinkedList<Attribute>();
+		Attributes pk = new Attributes();
 		pk.add(in[0]);
 		
-		Table t = new Table("test", Arrays.asList(in), pk);
+		Attributes attrs = new Attributes();
+		attrs.addAll(Arrays.asList(in));
+		
+		Table t = new Table("test", attrs, pk);
 		
 		// mysterious as to why i can't cast Attributes.toArray() to Attribute[]
 		Object[] out = t.getAttributes().toArray();

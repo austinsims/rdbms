@@ -30,5 +30,18 @@ public class AttributeTest {
 			throw e;
 		}
 	}
+	
+	/**
+	 * Test attribute name check.
+	 */
+	
+	@Test
+	public void testValidAttrName() {
+		assertTrue(Attribute.validName("king_kong"));
+		assertFalse(Attribute.validName("1monkeys_"));
+		assertTrue(Attribute.validName("_"));
+		assertFalse(Attribute.validName("123"));
+		assertFalse(Attribute.validName("Hello world!"));
+	}
 
 }
