@@ -14,7 +14,31 @@ public class SQLParser {
 			throw new InvalidSQLException(attr + " is not a valid attribute name");
 	}
 	
+	private static String pad(String s, String ch) {
+        return s.replaceAll("(?x) " + 
+         String.format("%s         ",ch) +   // Replace ch
+		               "(?=        " +   // Followed by
+		               "  (?:      " +   // Start a non-capture group
+		               "    [^']*  " +   // 0 or more non-single quote characters
+		               "    '      " +   // 1 single quote
+		               "    [^']*  " +   // 0 or more non-single quote characters
+		               "    '      " +   // 1 single quote
+		               "  )*       " +   // 0 or more repetition of non-capture group (multiple of 2 quotes will be even)
+		               "  [^']*    " +   // Finally 0 or more non-single quotes
+		               "  $        " +   // Till the end  (This is necessary, else every _ will satisfy the condition)
+		               ")          " ,   // End look-ahead
+         String.format(" %s ",ch));      // Replace with " , "
+
+	}
+	
 	public static int parse(String statement) throws InvalidSQLException {
+		/*
+		// Pad all commas and parens that aren't in single quotes with spaces so that they are individual tokens.
+		statement = pad(statement, ",");
+		statement = pad(statement, "\\(");
+		statement = pad(statement, "\\)");
+		*/
+		
 		Scanner tokens = new Scanner(statement);
 		String command = tokens.next();
 		boolean expectComma = true;
@@ -32,6 +56,10 @@ public class SQLParser {
 				String tableName = tokens.next();
 				if (!tokens.next().equals("("))
 					throw new InvalidSQLException("Table name must be followed by (");
+				
+				// Make sure a table by that name does not already exist
+				if (Table.tables.contains(tableName))
+					throw new InvalidSQLException("A table named " + tableName + " already exists.");
 				
 				// Begin parsing attributes of form: name type [CHECK ( constraint )]
 				
@@ -108,7 +136,8 @@ public class SQLParser {
 					attributes.add(newAttr);
 					
 				}
-				
+
+				// TODO: Error out if the PK is not specified
 				// Parse PRIMARY KEY ( attr1, attr2, ... )
 				// "PRIMARY KEY" already swallowed by attribute loop. still need to swallow the open paren
 				if (!tokens.next().equals("(")) throw new InvalidSQLException("PRIMARY KEY must be followed by parenthesized attribute list");
@@ -190,8 +219,122 @@ public class SQLParser {
 				System.out.println("Created new table successfully:");
 				System.out.println(newTable);
 				// TODO: Actually put the table into the database.
+				break;
+			case "DROP":
+				if (!tokens.next().equals("TABLE")) throw new InvalidSQLException("DROP must be followed by TABLE");
+				String tableToDrop = tokens.next();
+				if (tableToDrop.charAt(tableToDrop.length() - 1) != ';') 
+					throw new InvalidSQLException("Missing semicolon");
+				tableToDrop = tableToDrop.substring(0, tableToDrop.length() - 1);
+				if (!Table.tables.contains(tableToDrop))
+					throw new InvalidSQLException("Table " + tableToDrop + " does not exist");
+				Table.tables.remove(Table.tables.get(tableToDrop));
+				System.out.println("Table dropped successfully");
+				break;
+			case "SELECT":
+				// Parse attribute list
+				boolean hasNextAttr = true;
+				while (hasNextAttr) {
+					String attr = tokens.next();
+					// check if attribute exists
+					
+				}
+				// swallow FROM
 				
-			}
+				// parse table list
+				
+				// swallow optional WHERE
+				
+				// parse optional condition list
+				
+				break;
+			case "INSERT":
+				if (!tokens.next().equals("INTO"))
+					throw new InvalidSQLException("INSERT must be followed by INTO");
+				String tableToInsertName = tokens.next();
+				if (!Table.tables.contains(tableToInsertName))
+					throw new InvalidSQLException("Table " + tableToInsertName + " does not exist");
+				if (!tokens.next().equals("VALUES"))
+					throw new InvalidSQLException("Table name must be followed by VALUES");
+				if (!tokens.next().equals("("))
+					throw new InvalidSQLException("Missing open paren");
+				
+				Table tableToInsert = Table.tables.get(tableToInsertName);
+				Attributes schema = tableToInsert.getAttributes();
+				Row newRow = new Row(schema);
+				int colNum = 0;
+				boolean hasNextValue = true;
+				while (hasNextValue) {
+					String tk = tokens.next();
+					switch (tk) {
+					case ");":
+						hasNextValue = false;
+						break;
+					default:
+						hasNextValue = true;
+						String value = tk;
+						Attribute attr;
+						try {
+							attr = schema.get(colNum);
+						} catch (IndexOutOfBoundsException e) {
+							throw new InvalidSQLException("You have specified too many values for this table");
+						}
+						switch (attr.getType()) {
+						case INT:
+							int intValue;
+							try {
+								intValue = Integer.valueOf(value);
+							} catch (NumberFormatException e) {
+								throw new InvalidSQLException("The value " + value + " cannot be interpreted as an integer");
+							}
+							newRow.set(colNum, new IntValue(intValue));
+							break;
+						case DECIMAL:
+							double decValue;
+							try {
+								decValue = Double.valueOf(value);
+							} catch (NumberFormatException e) {
+								throw new InvalidSQLException("The value " + value + " cannot be interpreted as a decimal");
+							}
+							newRow.set(colNum, new DecValue(decValue));
+							break;
+						case CHAR:
+							if (value.charAt(0) != '\'' || value.charAt(value.length() - 1) != '\'')
+								throw new InvalidSQLException("String value not enclosed in single quotes");
+							String charValue = value.substring(1,value.length()-1);
+							if (charValue.length() > attr.charLen)
+								throw new InvalidSQLException("The value '" + charValue + "' is too long for the attribute + " + attr.getName());
+							newRow.set(colNum, new CharValue(charValue));
+							break;
+						}
+						break;
+					}
+					colNum++;
+				} // while (hasNextValue)
+				
+				tableToInsert.insert(newRow);
+				
+				if (!tokens.next().equals(")"))
+					throw new InvalidSQLException("Missing close paren");
+				
+				break;
+			case "DELETE":
+				
+				break;
+			case "UPDATE":
+				
+				break;
+			case "HELP":
+				
+				break;
+			case "QUIT;":
+				// TODO: Make sure all changes are committed and all resources are closed
+				System.exit(0);
+				break;
+			default:
+				System.err.println("Error, that is not a valid SQL command.");
+				break;
+			} // switch
 		} catch (InvalidSQLException e) {
 			tokens.close();
 			System.err.println(e.getMessage());

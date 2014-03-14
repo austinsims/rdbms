@@ -9,6 +9,7 @@ public class Table {
 	Attributes attributes;
 	Attributes pk;
 	List<ForeignKey> fks;
+	HashSet<Row> rows;
 	
 	static Tables tables;
 	
@@ -40,6 +41,7 @@ public class Table {
 			throw new IllegalArgumentException("All elements of pk " + pk + " must be contained in the attributes list " + attributes + "");
 		this.pk = pk;
 		this.fks = new LinkedList<ForeignKey>();
+		this.rows = new HashSet<Row>();
 	}
 	
 	public Attributes getAttributes() {
@@ -77,5 +79,9 @@ public class Table {
 		s.append(" )");
 		
 		return s.toString();
+	}
+
+	public void insert(Row newRow) {
+		rows.add(newRow);	
 	}
 }

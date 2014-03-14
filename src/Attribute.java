@@ -61,6 +61,10 @@ public class Attribute {
 		return name;
 	}
 	
+	public Type getType() {
+		return type;
+	}
+	
 	public static boolean validName(String attr) {
 		Set<Character> alphaSet = new HashSet<Character>();
 		for (Character c : "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_".toCharArray())

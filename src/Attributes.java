@@ -27,4 +27,15 @@ public class Attributes extends LinkedHashSet<Attribute> {
 		throw new IllegalArgumentException("Does not contain " + attrName);
 	}
 	
+	public Attribute get(int index) {
+		if (index >= this.size() || index < 0)
+			throw new IndexOutOfBoundsException();
+		int i = 0;
+		for (Attribute a : this) {
+			if (i == index) return a;
+			i++;
+		}
+		return null; // this will never happen because of the exception handling above
+	}
+	
 }
