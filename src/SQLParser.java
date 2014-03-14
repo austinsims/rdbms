@@ -17,6 +17,8 @@ public class SQLParser {
 	public static int parse(String statement) throws InvalidSQLException {
 		Scanner tokens = new Scanner(statement);
 		String command = tokens.next();
+		boolean expectComma = true;
+		
 		try {
 			switch (command) {
 			case "CREATE":
@@ -118,12 +120,18 @@ public class SQLParser {
 						throw new InvalidSQLException("The attribute list " + attributes + " does not contain the proposed PK attribute " + pkAttrStr);
 					pk.add(attributes.get(pkAttrStr));
 					
-					switch (tokens.next()) {
+					String tok = tokens.next();
+					switch (tok) {
 					case ",":
 						hasNextPkAttr = true;
 						break;
 					case ")":
 						hasNextPkAttr = false;
+						expectComma = true;
+						break;
+					case "),":
+						hasNextPkAttr = false;
+						expectComma = false;
 						break;
 					default:
 						throw new InvalidSQLException("Attributes within a PRIMARY KEY attribute list must be separated by commas");
@@ -136,16 +144,19 @@ public class SQLParser {
 				Table.insertIntoDB(newTable);
 				
 				// TODO:  Figure out why it isn't catching  FOREIGN for the next token
-				System.out.println(tokens.next());
 				
-				// Optionally Parse FOREIGN KEY ( fk ) REFERENCES table ( attr ), ...
-				if (tokens.hasNext("FOREIGN")) {
+				// Optionally Parse ', FOREIGN KEY' ( fk ) REFERENCES table ( attr ), ...
+				String expectedNextToken = expectComma ? "," : "FOREIGN";
+				if (tokens.hasNext(expectedNextToken)) {
+					// Swallow FOREIGN KEY and the comma if it is expected
+					if (expectComma) tokens.next(); // swallow comma
+					
+					if (!tokens.next().equals("FOREIGN")) throw new InvalidSQLException("FOREIGN must be followed by KEY");
+					if (!tokens.next().equals("KEY")) throw new InvalidSQLException("FOREIGN must be followed by KEY");
+					if (!tokens.next().equals("(")) throw new InvalidSQLException("FOREIGN must be followed by KEY");
 					
 					boolean hasNextFK = true;
 					while (hasNextFK) {
-						// Swallow FOREIGN KEY
-						tokens.next();
-						if (!tokens.next().equals("KEY")) throw new InvalidSQLException("FOREIGN must be followed by KEY");
 						String fkAttrName = tokens.next();
 						if (!tokens.next().equals(")")) throw new InvalidSQLException("FOREIGN KEY must specify one attribute followed by a ')'");
 						if (!tokens.next().equals("REFERENCES")) throw new InvalidSQLException("Invalid FOREIGN KEY expression");
