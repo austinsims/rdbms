@@ -18,6 +18,15 @@ public class CreateTableTest {
 		}
 	}
 	
+	@Test
+	public void denseQuery() throws InvalidSQLException {
+		try {
+			SQLParser.parse("CREATE TABLE climate(ssn int,name char(50),age int,PRIMARY KEY(ssn));");
+		} catch (InvalidSQLException e) {
+			throw e;
+		}
+	}
+	
 	/**
 	 * Basic FK that references another table. 
 	 */

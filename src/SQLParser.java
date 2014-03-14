@@ -32,12 +32,10 @@ public class SQLParser {
 	}
 	
 	public static int parse(String statement) throws InvalidSQLException {
-		/*
 		// Pad all commas and parens that aren't in single quotes with spaces so that they are individual tokens.
 		statement = pad(statement, ",");
 		statement = pad(statement, "\\(");
 		statement = pad(statement, "\\)");
-		*/
 		
 		Scanner tokens = new Scanner(statement);
 		String command = tokens.next();
@@ -86,9 +84,12 @@ public class SQLParser {
 						attrType = Attribute.Type.INT;
 					} else if (attrTypeStr.equals("decimal")) {
 						attrType = Attribute.Type.DECIMAL;
-					} else if (attrTypeStr.startsWith("char(")) {
+					} else if (attrTypeStr.equals("char")) {
 						try {
-							charLen = Integer.valueOf(attrTypeStr.substring(attrTypeStr.indexOf('(')+1, attrTypeStr.length()-1));
+							if (!tokens.next().equals("(")) throw new InvalidSQLException("must specify char ( LEN )");
+							charLen = Integer.valueOf(tokens.next());
+							String tok = tokens.next();
+							if (!tok.equals(")")) throw new InvalidSQLException("must specify char ( LEN )");
 						} catch (NumberFormatException e) {
 							throw new InvalidSQLException("Invalid attribute type: " + attrTypeStr);
 						}
@@ -213,8 +214,8 @@ public class SQLParser {
 
 				}
 				
-				String tok = tokens.next();
-				if (!tok.equals(");")) throw new InvalidSQLException("Must close CREATE TABLE with ');'");
+				if (!tokens.next().equals(")")) throw new InvalidSQLException("Must close CREATE TABLE with ');'");
+				if (!tokens.next().equals(";")) throw new InvalidSQLException("Must close CREATE TABLE with ');'");
 				
 				System.out.println("Created new table successfully:");
 				System.out.println(newTable);
