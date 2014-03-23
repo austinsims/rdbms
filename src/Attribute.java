@@ -95,4 +95,13 @@ public class Attribute {
 	
 		return true;
 	}
+	
+	// TODO: Constraints
+	public boolean matches(Value v) {
+		if (type != v.getType()) return false;
+		if (type == Type.CHAR) {
+			if (((CharValue) v).value.length() > charLen) return false;
+		}
+		return true;
+	}
 }

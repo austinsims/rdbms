@@ -13,17 +13,19 @@ public class Conditions extends ArrayList<Conditions.Condition> {
 	
 	class Condition {
 		Attribute attr;
-		Operator op;
+		Operator operator;
+		Value value;
 		
-		public Condition(Attribute attr, Operator op) {
+		public Condition(Attribute attr, Operator op, Value val) {
 			this.attr = attr;
-			this.op = op;
+			this.operator = op;
+			this.value = val;
 		}
 		
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
 			sb.append(attr.getName() + " ");
-			switch (op) {
+			switch (operator) {
 			case EQUAL:
 				sb.append("=");
 				break;
@@ -43,38 +45,38 @@ public class Conditions extends ArrayList<Conditions.Condition> {
 				sb.append("<>");
 				break;
 			}
+			sb.append (" " + value);
 			return sb.toString();
 		}
 
 	}
 	
-	public boolean add(Attribute attr, Operator op) {
-		return add(new Condition(attr, op));
+	public boolean add(Attribute attr, Operator op, Value value) {
+		return add(new Condition(attr, op, value));
 	}
 
-	public boolean test(Row row, Arguments args) throws SchemaViolationException {
+	public boolean test(Row row) throws SchemaViolationException {
 		boolean pass = true;
 		for (Condition cond : this) {
 			Value rowValue = row.get(cond.attr);
-			Value argValue = args.getValueOf(cond.attr);
-			switch (cond.op) {
+			switch (cond.operator) {
 			case EQUAL:
-				pass = pass && rowValue.equals(argValue);
+				pass = pass && rowValue.equals(cond.value);
 				break;
 			case GREATER:
-				pass = pass && rowValue.greaterThan(argValue);
+				pass = pass && rowValue.greaterThan(cond.value);
 				break;
 			case GREATER_OR_EQUAL:
-				pass = pass && rowValue.equals(argValue) || rowValue.greaterThan(argValue);
+				pass = pass && rowValue.equals(cond.value) || rowValue.greaterThan(cond.value);
 				break;
 			case LESS:
-				pass = pass && rowValue.lessThan(argValue);
+				pass = pass && rowValue.lessThan(cond.value);
 				break;
 			case LESS_OR_EQUAL:
-				pass = pass && rowValue.lessThan(argValue) || rowValue.equals(argValue);
+				pass = pass && rowValue.lessThan(cond.value) || rowValue.equals(cond.value);
 				break;
 			case NOT_EQUAL:
-				pass = pass && !rowValue.equals(argValue);
+				pass = pass && !rowValue.equals(cond.value);
 				break;
 			}
 		}

@@ -3,13 +3,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import com.sun.org.apache.xml.internal.utils.UnImplNode;
+
 
 public class Table {
 	String name;
-	Attributes attributes;
+	Attributes schema;
 	Attributes pk;
 	List<ForeignKey> fks;
-	HashSet<Row> rows;
+	Rows rows;
 	
 	static Tables tables;
 	
@@ -20,7 +22,10 @@ public class Table {
 	static void insertIntoDB(Table t) {
 		tables.add(t);
 	}
-
+	
+	static void dropEverything() {
+		tables.clear();
+	}
 	
 	class ForeignKey {
 		String domesticAttribute;
@@ -34,18 +39,18 @@ public class Table {
 		}
 	}
 	
-	public Table(String name, Attributes attributes, Attributes pk) {
+	public Table(String name, Attributes schema, Attributes pk) {
 		this.name = name;
-		this.attributes = attributes;
-		if (!attributes.containsAll(pk))
-			throw new IllegalArgumentException("All elements of pk " + pk + " must be contained in the attributes list " + attributes + "");
+		this.schema = schema;
+		if (!schema.containsAll(pk))
+			throw new IllegalArgumentException("All elements of pk " + pk + " must be contained in the attributes list " + schema + "");
 		this.pk = pk;
 		this.fks = new LinkedList<ForeignKey>();
-		this.rows = new HashSet<Row>();
+		this.rows = new Rows(schema);
 	}
 	
 	public Attributes getAttributes() {
-		return attributes;
+		return schema;
 	}
 	
 	public String getName() {
@@ -53,11 +58,10 @@ public class Table {
 	}
 	
 	// TODO: ...where to do all the integrity checking???? Here or somewhere else?
-	public void addFK(String domesticAttr, String foreignTable, String foreignAttr) throws IntegrityException {
-		if (!attributes.contains(domesticAttr)) throw new IntegrityException(String.format("The table %s does not contain an attribute named %s.", name, domesticAttr));
+	public void addFK(String domesticAttr, String foreignTable, String foreignAttr) throws IntegrityException, SchemaViolationException {
+		if (!schema.contains(domesticAttr)) throw new IntegrityException(String.format("The table %s does not contain an attribute named %s.", name, domesticAttr));
 		if (!tables.contains(foreignTable)) throw new IntegrityException(String.format("The foreign table %s does not exist.", foreignTable));
-		if (!tables.get(foreignTable).getAttributes().contains(foreignAttr)) throw new IntegrityException(String.format("The foreign table %s does not contain the attribute %s.", foreignTable, foreignAttr));
-		
+		if (!tables.get(foreignTable).getAttributes().contains(foreignAttr))throw new IntegrityException(String.format("The foreign table %s does not contain the attribute %s.", foreignTable, foreignAttr));
 		fks.add(new ForeignKey(domesticAttr, foreignTable, foreignAttr));
 	}
 	
@@ -66,7 +70,7 @@ public class Table {
 		
 		// List attributes
 		s.append(String.format("%s ( ", name));
-		for (Attribute a : attributes) {
+		for (Attribute a : schema) {
 			s.append(a.toString() + ", ");
 		}
 		
@@ -81,7 +85,59 @@ public class Table {
 		return s.toString();
 	}
 
-	public void insert(Row newRow) {
-		rows.add(newRow);	
+	public boolean insert(Row newRow) throws SchemaViolationException {
+		// Get the new row's PK.
+		Value[] newRowPKValues =  newRow.get(pk);		
+		// If a row with that PK exists, throw exception
+		Conditions cond = new Conditions();
+		int i = 0;
+		for (Attribute a : pk) {
+			cond.add(a, Conditions.Operator.EQUAL, newRowPKValues[i]);
+			i++;
+		}
+		if (rows.getAll(cond).size() > 0)
+			throw new SchemaViolationException("This table already has a row with the PK = " + newRowPKValues);
+		
+		return rows.add(newRow);
+	}
+
+	public static Rows select(List<String> selectedAttributes, List<String> selectedTables, Conditions conditions) throws SchemaViolationException {
+		if (selectedTables.size() > 1) throw new RuntimeException("Sorry, join is not yet implemented");
+		
+		// if no Conditions specified, create a new one with no conditions (always passes)
+		if (conditions == null)
+			conditions =  new Conditions();
+
+		Table t = Table.tables.get(selectedTables.get(0));
+		
+		Attributes subschema = new Attributes();
+		for (String attrName : selectedAttributes) {
+			subschema.add(t.schema.get(attrName));
+		}
+		
+		Rows result = t.rows.getAll(conditions).project(subschema);
+		
+		return result;
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

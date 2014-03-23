@@ -13,9 +13,9 @@ public class Tables extends HashSet<Table> {
 	 * @param name
 	 * @return
 	 */
-	public Table get(String name) {
+	public Table get(String name) throws SchemaViolationException {
 		for (Table t : this) 
 			if (t.getName().equals(name)) return t;
-		return null;
+		throw new SchemaViolationException("The table named " + name + " does not exist");
 	}
 }

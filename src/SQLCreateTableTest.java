@@ -3,7 +3,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 
-public class CreateTableTest {
+public class SQLCreateTableTest {
 	
 	/**
 	 * Very basic table with spaces between all tokens

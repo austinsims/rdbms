@@ -33,14 +33,23 @@ public class ConditionsTest {
 		Conditions cond = new Conditions();
 		Arguments args = new Arguments();
 		
-		cond.add(age, Conditions.Operator.EQUAL);		
-		args.add(age, new IntValue(22));
-		assertTrue(cond.test(row, args));
+		// Age == 22
+		cond.add(age, Conditions.Operator.EQUAL, new IntValue(22));	
+		assertTrue(cond.test(row));
 		
 		cond = new Conditions();
 		args = new Arguments();
-		cond.add(name, Conditions.Operator.LESS);
-		args.add()
+		
+		// Name < 'Lucy'
+		cond.add(name, Conditions.Operator.LESS, new CharValue("Lucy"));
+		assertTrue(cond.test(row));
+		
+		cond = new Conditions();
+		args = new Arguments();
+		
+		// Salary > 20000.0
+		cond.add(salary, Conditions.Operator.GREATER, new DecValue(20000.0));
+		assertTrue(cond.test(row));
 		
 	}
 
