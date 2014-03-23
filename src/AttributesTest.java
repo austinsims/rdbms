@@ -29,13 +29,13 @@ public class AttributesTest {
 					new Attribute("height", Attribute.Type.INT) }));
 			
 			Attributes b1 = new Attributes();
-			a2.addAll(Arrays.asList(new Attribute[] {
+			b1.addAll(Arrays.asList(new Attribute[] {
 					new Attribute("name", Attribute.Type.CHAR, 40),
 					new Attribute("age", Attribute.Type.INT),
 					new Attribute("height", Attribute.Type.INT) }));
 			
 			Attributes b2 = new Attributes();
-			a2.addAll(Arrays.asList(new Attribute[] {
+			b2.addAll(Arrays.asList(new Attribute[] {
 					new Attribute("name", Attribute.Type.CHAR, 40),
 					new Attribute("height", Attribute.Type.INT) }));
 			

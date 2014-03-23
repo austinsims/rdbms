@@ -1,9 +1,15 @@
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
+import org.junit.Before;
 import org.junit.Test;
 
 
 public class SQLCreateTableTest {
+	
+	@Before
+	public void setUp() {
+		Table.dropEverything();
+	}
 	
 	/**
 	 * Very basic table with spaces between all tokens

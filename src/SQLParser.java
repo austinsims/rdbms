@@ -225,9 +225,8 @@ public class SQLParser {
 			case "DROP":
 				if (!tokens.next().equals("TABLE")) throw new InvalidSQLException("DROP must be followed by TABLE");
 				String tableToDrop = tokens.next();
-				if (tableToDrop.charAt(tableToDrop.length() - 1) != ';') 
+				if (!tokens.next().equals(";")) 
 					throw new InvalidSQLException("Missing semicolon");
-				tableToDrop = tableToDrop.substring(0, tableToDrop.length() - 1);
 				try {
 				Table.tables.remove(Table.tables.get(tableToDrop));
 				} catch (SchemaViolationException e) {

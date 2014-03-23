@@ -59,8 +59,15 @@ public class Attributes extends LinkedHashSet<Attribute> {
 	public boolean equals(Attributes other) {
 		if (other.size() != this.size()) return false;
 		
+		/*
 		for (int i = 0; i < size(); i++) {
 			if (other.get(i).getType() != this.get(i).getType()) return false;
+		}
+		*/
+		
+		for (int i=0; i<size(); i++) {
+			if (!get(i).equals(other.get(i)))
+				return false;
 		}
 		
 		return true;
