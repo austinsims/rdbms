@@ -527,27 +527,44 @@ public class SQLParser {
 				Conditions deletionConditions = parseConditionList(tokens,
 						deletionTables);
 
-				List<Row> toDelete = new ArrayList<Row>();
-
-				for (Row row : tableToDeleteFrom.rows) {
-					try {
-						if (deletionConditions.test(row)) {
-							toDelete.add(row);
-						}
-					} catch (SchemaViolationException e) {
-						throw new InvalidSQLException(
-								"The row "
-										+ row
-										+ " cannot be tested against the deletion conditions "
-										+ deletionConditions);
-					}
+				Rows toDelete;
+				try {
+					toDelete = tableToDeleteFrom.rows.getAll(deletionConditions);
+				} catch (SchemaViolationException e) {
+					throw new InvalidSQLException("Got a schema violation: " + e.getMessage());
 				}
 				
 				tableToDeleteFrom.rows.removeAll(toDelete);
 
 				break;
 			case "UPDATE":
-
+				Table tableToUpdate;
+				try {
+					tableToUpdate = Table.tables.get(tokens.next());
+				} catch (SchemaViolationException e) {
+					throw new InvalidSQLException("Schema violation: " + e.getMessage());
+				}
+				
+				List<String> updateTables = new ArrayList<String>();
+				updateTables.add(tableToUpdate.getName());
+				
+				if (!tokens.next().equals("SET"))
+					throw new InvalidSQLException("UPDATE table_name must be followed by SET");
+				
+				boolean hasNextAttrVal = true;
+				while (hasNextAttrVal) {
+					// TODO: process attr1 = val1, attr2 = val2, ...
+				}
+				
+				if (!tokens.next().equals("WHERE"))
+					throw new InvalidSQLException("Attribute/value pair list must be followed by WHERE condition_list");
+				
+				//TODO: process condition list
+				
+				//TODO: execute update
+				
+				// TODO: print number of rows affected
+				
 				break;
 			case "HELP":
 
