@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
@@ -10,8 +12,7 @@ public class SQLParser {
 
 	private void validateAttrNameOrDie(String attr) throws InvalidSQLException {
 		if (!Attribute.validName(attr))
-			throw new InvalidSQLException(attr
-					+ " is not a valid attribute name");
+			throw new InvalidSQLException(attr + " is not a valid attribute name");
 	}
 
 	private static String pad(String s, String ch) {
@@ -35,7 +36,7 @@ public class SQLParser {
 
 	public static int parse(String statement) throws InvalidSQLException {
 		// Pad all commas and parens that aren't in single quotes with spaces so
-		// that they are individual tokens.
+		// that they become individual tokens.
 		statement = pad(statement, ",");
 		statement = pad(statement, ";");
 		statement = pad(statement, "\\(");
@@ -49,8 +50,7 @@ public class SQLParser {
 			switch (command) {
 			case "CREATE":
 				if (!tokens.next().equals("TABLE"))
-					throw new InvalidSQLException(
-							"CREATE must be followed by TABLE.");
+					throw new InvalidSQLException("CREATE must be followed by TABLE.");
 
 				// Initialize what we need to make a new table
 				Attributes attributes = new Attributes();
@@ -58,13 +58,11 @@ public class SQLParser {
 				// Parse name
 				String tableName = tokens.next();
 				if (!tokens.next().equals("("))
-					throw new InvalidSQLException(
-							"Table name must be followed by (");
+					throw new InvalidSQLException("Table name must be followed by (");
 
 				// Make sure a table by that name does not already exist
 				if (Table.tables.contains(tableName))
-					throw new InvalidSQLException("A table named " + tableName
-							+ " already exists.");
+					throw new InvalidSQLException("A table named " + tableName + " already exists.");
 
 				// Begin parsing attributes of form: name type [CHECK (
 				// constraint )]
@@ -84,8 +82,7 @@ public class SQLParser {
 						// Whoops, we're past the attribute list. Now we're at
 						// FOREIGN KEY ...
 						if (!tokens.next().equals("KEY"))
-							throw new InvalidSQLException(
-									"PRIMARY must be followed by KEY");
+							throw new InvalidSQLException("PRIMARY must be followed by KEY");
 						hasNextAttribute = false;
 						break;
 					}
@@ -99,22 +96,18 @@ public class SQLParser {
 					} else if (attrTypeStr.equals("char")) {
 						try {
 							if (!tokens.next().equals("("))
-								throw new InvalidSQLException(
-										"must specify char ( LEN )");
+								throw new InvalidSQLException("must specify char ( LEN )");
 							charLen = Integer.valueOf(tokens.next());
 							String tok = tokens.next();
 							if (!tok.equals(")"))
-								throw new InvalidSQLException(
-										"must specify char ( LEN )");
+								throw new InvalidSQLException("must specify char ( LEN )");
 						} catch (NumberFormatException e) {
-							throw new InvalidSQLException(
-									"Invalid attribute type: " + attrTypeStr);
+							throw new InvalidSQLException("Invalid attribute type: " + attrTypeStr);
 						}
 						attrType = Attribute.Type.CHAR;
 
 					} else {
-						throw new InvalidSQLException(
-								"Invalid attribute type: " + attrTypeStr);
+						throw new InvalidSQLException("Invalid attribute type: " + attrTypeStr);
 					}
 
 					// Detect either comma for next attr, or constraint, or
@@ -131,12 +124,10 @@ public class SQLParser {
 					case "CHECK":
 						// Begin parsing constraint of form: ( constraint )
 						if (!tokens.next().equals("("))
-							throw new InvalidSQLException(
-									"Invalid argument list");
+							throw new InvalidSQLException("Invalid argument list");
 						constraint = tokens.next();
 						if (!tokens.next().equals(")"))
-							throw new InvalidSQLException(
-									"Invalid argument list");
+							throw new InvalidSQLException("Invalid argument list");
 						break;
 					default:
 						throw new InvalidSQLException("Invalid argument list");
@@ -151,13 +142,11 @@ public class SQLParser {
 							newAttr = new Attribute(attrName, attrType);
 						}
 					} catch (InvalidAttributeException e) {
-						throw new InvalidSQLException("Invalid SQL: "
-								+ e.getMessage());
+						throw new InvalidSQLException("Invalid SQL: " + e.getMessage());
 					}
 
 					if (constraint != null) {
-						newAttr.setConstraint(new Attribute.Constraint(
-								constraint));
+						newAttr.setConstraint(new Attribute.Constraint(constraint));
 					}
 					attributes.add(newAttr);
 
@@ -168,26 +157,15 @@ public class SQLParser {
 				// "PRIMARY KEY" already swallowed by attribute loop. still need
 				// to swallow the open paren
 				if (!tokens.next().equals("("))
-					throw new InvalidSQLException(
-							"PRIMARY KEY must be followed by parenthesized attribute list");
+					throw new InvalidSQLException("PRIMARY KEY must be followed by parenthesized attribute list");
 				boolean hasNextPkAttr = true;
 				Attributes pk = new Attributes();
 				while (hasNextPkAttr) {
 					String pkAttrStr = tokens.next();
 					if (!attributes.contains(pkAttrStr))
-						throw new InvalidSQLException(
-								"The attribute list "
-										+ attributes
-										+ " does not contain the proposed PK attribute "
-										+ pkAttrStr);
-					try {
-						pk.add(attributes.get(pkAttrStr));
-					} catch (SchemaViolationException e) {
-						throw new InvalidSQLException(
-								"There was a schema violation: "
-										+ e.getMessage());
-					}
-
+						throw new InvalidSQLException("The attribute list " + attributes
+								+ " does not contain the proposed PK attribute " + pkAttrStr);
+					pk.add(attributes.get(pkAttrStr));
 					String tok = tokens.next();
 					switch (tok) {
 					case ",":
@@ -221,40 +199,28 @@ public class SQLParser {
 						tokens.next(); // swallow comma
 
 					if (!tokens.next().equals("FOREIGN"))
-						throw new InvalidSQLException(
-								"FOREIGN must be followed by KEY");
+						throw new InvalidSQLException("FOREIGN must be followed by KEY");
 					if (!tokens.next().equals("KEY"))
-						throw new InvalidSQLException(
-								"FOREIGN must be followed by KEY");
+						throw new InvalidSQLException("FOREIGN must be followed by KEY");
 					if (!tokens.next().equals("("))
-						throw new InvalidSQLException(
-								"FOREIGN must be followed by KEY");
+						throw new InvalidSQLException("FOREIGN must be followed by KEY");
 
 					boolean hasNextFK = true;
 					while (hasNextFK) {
 						String fkAttrName = tokens.next();
 						if (!tokens.next().equals(")"))
-							throw new InvalidSQLException(
-									"FOREIGN KEY must specify one attribute followed by a ')'");
+							throw new InvalidSQLException("FOREIGN KEY must specify one attribute followed by a ')'");
 						if (!tokens.next().equals("REFERENCES"))
-							throw new InvalidSQLException(
-									"Invalid FOREIGN KEY expression");
+							throw new InvalidSQLException("Invalid FOREIGN KEY expression");
 						String foreignTable = tokens.next();
 						if (!tokens.next().equals("("))
-							throw new InvalidSQLException(
-									"Invalid FOREIGN KEY expression");
+							throw new InvalidSQLException("Invalid FOREIGN KEY expression");
 						String foreignAttr = tokens.next();
 
 						try {
-							newTable.addFK(fkAttrName, foreignTable,
-									foreignAttr);
+							newTable.addFK(fkAttrName, foreignTable, foreignAttr);
 						} catch (IntegrityException e) {
-							throw new InvalidSQLException(
-									"Got an integrity violation: "
-											+ e.getMessage());
-						} catch (SchemaViolationException e) {
-							throw new InvalidSQLException("Schema violation: "
-									+ e.getMessage());
+							throw new InvalidSQLException("Got an integrity violation: " + e.getMessage());
 						}
 
 						String tok = tokens.next();
@@ -272,27 +238,20 @@ public class SQLParser {
 				}
 
 				if (!tokens.next().equals(")"))
-					throw new InvalidSQLException(
-							"Must close CREATE TABLE with ');'");
+					throw new InvalidSQLException("Must close CREATE TABLE with ');'");
 				if (!tokens.next().equals(";"))
-					throw new InvalidSQLException(
-							"Must close CREATE TABLE with ');'");
+					throw new InvalidSQLException("Must close CREATE TABLE with ');'");
 
 				System.out.println("Created table successfully");
 				break;
 			case "DROP":
 				if (!tokens.next().equals("TABLE"))
-					throw new InvalidSQLException(
-							"DROP must be followed by TABLE");
+					throw new InvalidSQLException("DROP must be followed by TABLE");
 				String tableToDrop = tokens.next();
 				if (!tokens.next().equals(";"))
 					throw new InvalidSQLException("Missing semicolon");
-				try {
-					Table.tables.remove(Table.tables.get(tableToDrop));
-				} catch (SchemaViolationException e) {
-					throw new InvalidSQLException("Table " + tableToDrop
-							+ " does not exist");
-				}
+
+				Table.tables.remove(Table.tables.get(tableToDrop));
 				System.out.println("Table dropped successfully");
 				break;
 			case "SELECT":
@@ -326,8 +285,7 @@ public class SQLParser {
 
 				// swallow FROM
 				if (!tokens.next().equals("FROM"))
-					throw new InvalidSQLException(
-							"Attribute list must be followed by FROM");
+					throw new InvalidSQLException("Attribute list must be followed by FROM");
 
 				// parse table list
 				boolean hasNextTable = true;
@@ -353,13 +311,7 @@ public class SQLParser {
 				if (selectAll) {
 					// Add each attribute of each table (but not duplicates)
 					for (String selectedTable : selectedTables) {
-						Table t = null;
-						try {
-							t = Table.tables.get(selectedTable);
-						} catch (SchemaViolationException e) {
-							throw new InvalidSQLException("Schema violation: "
-									+ e.getMessage());
-						}
+						Table t = Table.tables.get(selectedTable);
 						for (Attribute a : t.getAttributes()) {
 							if (!selectedAttributes.contains(a.getName())) {
 								selectedAttributes.add(a.getName());
@@ -373,119 +325,52 @@ public class SQLParser {
 					cond = parseConditionList(tokens, selectedTables);
 				} // if (whereClause)
 
-				try {
-					Rows result = Table.select(selectedAttributes,
-							selectedTables, cond);
+				Rows result = Table.select(selectedAttributes, selectedTables, cond);
 
-					// Print table header
-					System.out.println(result.schema.tableHeader());
-					// Print rows
-					for (Row r : result)
-						System.out.println(r.tableRow());
-
-				} catch (SchemaViolationException e) {
-					throw new InvalidSQLException(
-							"There was a schema violation: " + e.getMessage());
-				}
+				// Print table header
+				System.out.println(result.schema.tableHeader());
+				// Print rows
+				for (Row r : result)
+					System.out.println(r.tableRow());
 
 				break;
 			case "INSERT":
 				if (!tokens.next().equals("INTO"))
-					throw new InvalidSQLException(
-							"INSERT must be followed by INTO");
+					throw new InvalidSQLException("INSERT must be followed by INTO");
 				String tableToInsertName = tokens.next();
 				if (!Table.tables.contains(tableToInsertName))
-					throw new InvalidSQLException("Table " + tableToInsertName
-							+ " does not exist");
+					throw new InvalidSQLException("Table " + tableToInsertName + " does not exist");
 				if (!tokens.next().equals("VALUES"))
-					throw new InvalidSQLException(
-							"Table name must be followed by VALUES");
+					throw new InvalidSQLException("Table name must be followed by VALUES");
 				if (!tokens.next().equals("("))
 					throw new InvalidSQLException("Missing open paren");
 
-				Table tableToInsert = null;
-				try {
-					tableToInsert = Table.tables.get(tableToInsertName);
-				} catch (SchemaViolationException e) {
-					throw new InvalidSQLException("Schema violation: "
-							+ e.getMessage());
-				}
+				Table tableToInsert = Table.tables.get(tableToInsertName);
 				Attributes schema = tableToInsert.getAttributes();
 				Row newRow = new Row(schema);
 				int colNum = 0;
 				boolean hasNextValue = true;
 				while (hasNextValue) {
-					String tk = tokens.next();
-					switch (tk) {
-					case ")":
+					if (tokens.hasNext("\\)")) {
+						tokens.next();
 						hasNextValue = false;
-						break;
-					case ",":
+					} else if (tokens.hasNext(",")) {
+						tokens.next();
 						hasNextValue = true;
 						break;
-					default:
+					} else {
+						// Consume any whitespace
+						while (tokens.hasNext(" "))
+							tokens.next(" ");
 						hasNextValue = true;
-						String value = tk;
 						Attribute attr;
 						try {
 							attr = schema.get(colNum);
 						} catch (IndexOutOfBoundsException e) {
-							throw new InvalidSQLException(
-									"You have specified too many values for this table");
+							throw new InvalidSQLException("You have specified too many values for this table");
 						}
-						switch (attr.getType()) {
-						case INT:
-							int intValue;
-							try {
-								intValue = Integer.valueOf(value);
-							} catch (NumberFormatException e) {
-								throw new InvalidSQLException(
-										"The value "
-												+ value
-												+ " cannot be interpreted as an integer");
-							}
-							try {
-								newRow.set(colNum, new IntValue(intValue));
-							} catch (SchemaViolationException e) {
-								e.printStackTrace();
-							}
-							break;
-						case DECIMAL:
-							double decValue;
-							try {
-								decValue = Double.valueOf(value);
-							} catch (NumberFormatException e) {
-								throw new InvalidSQLException("The value "
-										+ value
-										+ " cannot be interpreted as a decimal");
-							}
-							try {
-								newRow.set(colNum, new DecValue(decValue));
-							} catch (SchemaViolationException e) {
-								e.printStackTrace();
-							}
-							break;
-						case CHAR:
-							char c1 = value.charAt(0);
-							char c2 = value.charAt(value.length() - 1);
-							if (value.charAt(0) != '\''
-									|| value.charAt(value.length() - 1) != '\'')
-								throw new InvalidSQLException(
-										"String value not enclosed in single quotes");
-							String charValue = value.substring(1,
-									value.length() - 1);
-							if (charValue.length() > attr.charLen)
-								throw new InvalidSQLException("The value '"
-										+ charValue
-										+ "' is too long for the attribute + "
-										+ attr.getName());
-							try {
-								newRow.set(colNum, new CharValue(charValue));
-							} catch (SchemaViolationException e) {
-								e.printStackTrace();
-							}
-							break;
-						}
+						Value newValue = parseToValue(tokens, attr);
+						newRow.set(colNum, newValue);
 						colNum++;
 						break;
 					}
@@ -494,77 +379,80 @@ public class SQLParser {
 
 				// Check for semicolon
 				if (!tokens.next().equals(";"))
-					throw new InvalidSQLException(
-							"INSERT must end with a semicolon");
-				try {
-					tableToInsert.insert(newRow);
-				} catch (SchemaViolationException e) {
-					throw new InvalidSQLException("Schema violation: "
-							+ e.getMessage());
-				}
+					throw new InvalidSQLException("INSERT must end with a semicolon");
+
+				tableToInsert.insert(newRow);
 				System.out.println("Tuple inserted successfully");
 				break;
 			case "DELETE":
 				if (!tokens.next().equals("FROM"))
-					throw new InvalidSQLException(
-							"DELETE must be followed by FROM");
+					throw new InvalidSQLException("DELETE must be followed by FROM");
 
-				Table tableToDeleteFrom;
-				try {
-					tableToDeleteFrom = Table.tables.get(tokens.next());
-				} catch (SchemaViolationException e) {
-					throw new InvalidSQLException("Schema violation: "
-							+ e.getMessage());
-				}
+				Table tableToDeleteFrom = Table.tables.get(tokens.next());
 
 				List<String> deletionTables = new ArrayList<String>();
 				deletionTables.add(tableToDeleteFrom.getName());
 
 				if (!tokens.next().equals("WHERE"))
-					throw new InvalidSQLException(
-							"DELETE FROM table_name must be followed by WHERE condition_list");
+					throw new InvalidSQLException("DELETE FROM table_name must be followed by WHERE condition_list");
 
-				Conditions deletionConditions = parseConditionList(tokens,
-						deletionTables);
+				Conditions deletionConditions = parseConditionList(tokens, deletionTables);
 
 				Rows toDelete;
-				try {
-					toDelete = tableToDeleteFrom.rows.getAll(deletionConditions);
-				} catch (SchemaViolationException e) {
-					throw new InvalidSQLException("Got a schema violation: " + e.getMessage());
-				}
-				
+				toDelete = tableToDeleteFrom.rows.getAll(deletionConditions);
 				tableToDeleteFrom.rows.removeAll(toDelete);
 
 				break;
 			case "UPDATE":
-				Table tableToUpdate;
-				try {
-					tableToUpdate = Table.tables.get(tokens.next());
-				} catch (SchemaViolationException e) {
-					throw new InvalidSQLException("Schema violation: " + e.getMessage());
-				}
-				
+				Table tableToUpdate = Table.tables.get(tokens.next());
+
 				List<String> updateTables = new ArrayList<String>();
 				updateTables.add(tableToUpdate.getName());
-				
+
 				if (!tokens.next().equals("SET"))
 					throw new InvalidSQLException("UPDATE table_name must be followed by SET");
-				
+
+				Map<Attribute, Value> updates = new HashMap<Attribute, Value>();
 				boolean hasNextAttrVal = true;
 				while (hasNextAttrVal) {
-					// TODO: process attr1 = val1, attr2 = val2, ...
+					String attrName = tokens.next();
+					Attribute attr = tableToUpdate.schema.get(attrName);
+
+					if (!tokens.next().equals("="))
+						throw new InvalidSQLException("Attribute must be separated from value with an =");
+
+					String valStr = tokens.next();
+					Value newVal = parseToValue(tokens, attr);
+					updates.put(attr, newVal);
+
+					String tok = tokens.next();
+					switch (tok) {
+					case ",":
+						hasNextAttrVal = true;
+						break;
+					case "WHERE":
+						hasNextAttrVal = false;
+						break;
+					default:
+						throw new InvalidSQLException("Update list attr1 = val1 ... not followed by WHERE clause");
+					}
 				}
-				
-				if (!tokens.next().equals("WHERE"))
-					throw new InvalidSQLException("Attribute/value pair list must be followed by WHERE condition_list");
-				
-				//TODO: process condition list
-				
-				//TODO: execute update
-				
+
+				// Parse WHERE clause (condition list)
+
+				Conditions updateConditions = parseConditionList(tokens, updateTables);
+
+				Rows rowsToUpdate = tableToUpdate.rows.getAll(updateConditions);
+
+				for (Row row : rowsToUpdate) {
+					for (Attribute attr : updates.keySet()) {
+						row.set(attr, updates.get(attr));
+					}
+				}
+
 				// TODO: print number of rows affected
-				
+				System.out.printf("%d rows affected", rowsToUpdate.size());
+
 				break;
 			case "HELP":
 
@@ -582,6 +470,9 @@ public class SQLParser {
 			tokens.close();
 			System.err.println(e.getMessage());
 			throw e;
+		} catch (SchemaViolationException e) {
+			System.err.println("Schema violation: " + e.getMessage());
+			e.printStackTrace();
 		} finally {
 			tokens.close();
 		}
@@ -590,8 +481,73 @@ public class SQLParser {
 
 	}
 
-	private static Conditions parseConditionList(Scanner tokens,
-			List<String> selectedTables) throws InvalidSQLException {
+	private static String parseToQuotedChar(Scanner tokens) throws InvalidSQLException {
+
+		// Consume anything... spaces or whatever, before the opening single quote
+		while (true) {
+			char c = tokens.findInLine(".").charAt(0);
+			if (c == '\'') break;
+			else continue;
+		}
+		
+		/*
+		char firstChar = tokens.findInLine(".").charAt(0);
+		if (firstChar != '\'')
+			throw new InvalidSQLException("Character value must be wrapped in single quotes.");
+			*/
+		StringBuilder sb = new StringBuilder();
+
+		if (!tokens.hasNextByte()) {
+			throw new InvalidSQLException("Single quote found where whole quoted char value expected.");
+		} else {
+
+			while (tokens.hasNextByte()) {
+				char c = tokens.next(".").charAt(0);
+				if (c == '\'') {
+					return sb.toString();
+				} else {
+					sb.append(c);
+				}
+			}
+		}
+		
+		// If we reach here, we didn't return after finding closing quote
+		throw new InvalidSQLException("Char value never terminated by closing single quote.");
+
+	}
+
+	private static Value parseToValue(Scanner tokens, Attribute attr) throws InvalidSQLException {
+		switch (attr.getType()) {
+		case INT:
+			int intValue;
+			String intValStr = tokens.next();
+			try {
+				intValue = Integer.valueOf(intValStr);
+			} catch (NumberFormatException e) {
+				throw new InvalidSQLException("The value " + intValStr + " cannot be interpreted as an integer");
+			}
+			return new IntValue(intValue);
+		case DECIMAL:
+			double decValue;
+			String decValStr = tokens.next();
+			try {
+				decValue = Double.valueOf(decValStr);
+			} catch (NumberFormatException e) {
+				throw new InvalidSQLException("The value " + decValStr + " cannot be interpreted as a decimal");
+			}
+			return new DecValue(decValue);
+		case CHAR:
+			String charValue = parseToQuotedChar(tokens);
+			if (charValue.length() > attr.charLen)
+				throw new InvalidSQLException("The value '" + charValue + "' is too long for the attribute + "
+						+ attr.getName());
+			return new CharValue(charValue);
+		}
+		return null;
+	}
+
+	private static Conditions parseConditionList(Scanner tokens, List<String> selectedTables)
+			throws InvalidSQLException {
 		Conditions cond = new Conditions();
 
 		boolean and = false;
@@ -612,8 +568,7 @@ public class SQLParser {
 				try {
 					selectedTable = Table.tables.get(selectedTableName);
 				} catch (SchemaViolationException e) {
-					throw new InvalidSQLException("Schema violation: "
-							+ e.getMessage());
+					throw new InvalidSQLException("Schema violation: " + e.getMessage());
 				}
 				for (Attribute a : selectedTable.getAttributes()) {
 					if (a.getName().equals(attrName)) {
@@ -633,15 +588,13 @@ public class SQLParser {
 								break;
 							}
 						} catch (NumberFormatException e) {
-							throw new InvalidSQLException(valStr
-									+ " is not a properly formatted number");
+							throw new InvalidSQLException(valStr + " is not a properly formatted number");
 						}
 					}
 				}
 				if (attr == null)
 					throw new InvalidSQLException("The attribute " + attrName
-							+ " does not exist in any of the tables: "
-							+ selectedTables);
+							+ " does not exist in any of the tables: " + selectedTables);
 			}
 
 			Conditions.Operator op;
@@ -665,8 +618,7 @@ public class SQLParser {
 				op = Conditions.Operator.LESS_OR_EQUAL;
 				break;
 			default:
-				throw new InvalidSQLException(opStr
-						+ " is not a valid operator");
+				throw new InvalidSQLException(opStr + " is not a valid operator");
 			}
 
 			cond.add(attr, op, val);
@@ -682,16 +634,14 @@ public class SQLParser {
 				break;
 			case "AND":
 				if (or) {
-					throw new InvalidSQLException(
-							"AND and OR may not be mixed in a WHERE clause");
+					throw new InvalidSQLException("AND and OR may not be mixed in a WHERE clause");
 				}
 				and = true;
 				hasNextCondition = true;
 				break;
 			case "OR":
 				if (and) {
-					throw new InvalidSQLException(
-							"AND and OR may not be mixed in a WHERE clause");
+					throw new InvalidSQLException("AND and OR may not be mixed in a WHERE clause");
 				}
 				or = true;
 				hasNextCondition = true;
