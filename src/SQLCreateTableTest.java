@@ -51,20 +51,6 @@ public class SQLCreateTableTest {
 	}
 	
 	/**
-	 * Try to create a table with no attributes
-	 */
-	@Test
-	public void noAttrs()  {
-		try {
-			SQLParser.parse("CREATE TABLE ( );");
-			fail("Did not throw exception for table with no attributes");
-		} catch (InvalidSQLException e) {
-			// Pass
-		}
-	}
-	
-	
-	/**
 	 * Try to create a table with an illegal name
 	 */
 	

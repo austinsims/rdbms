@@ -119,6 +119,14 @@ public class Table {
 		
 		return result;
 	}
+
+	public boolean insertAll(Row... all) throws SchemaViolationException {
+		boolean success = true;
+		for (Row row : all) {
+			success = success && insert(row);
+		}
+		return success;
+	}
 }
 
 

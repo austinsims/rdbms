@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 // TODO: Verify all attribute names with verifyAttrNameOrDie
 
@@ -357,11 +358,7 @@ public class SQLParser {
 					} else if (tokens.hasNext(",")) {
 						tokens.next();
 						hasNextValue = true;
-						break;
 					} else {
-						// Consume any whitespace
-						while (tokens.hasNext(" "))
-							tokens.next(" ");
 						hasNextValue = true;
 						Attribute attr;
 						try {
@@ -372,13 +369,13 @@ public class SQLParser {
 						Value newValue = parseToValue(tokens, attr);
 						newRow.set(colNum, newValue);
 						colNum++;
-						break;
 					}
 
 				} // while (hasNextValue)
 
 				// Check for semicolon
-				if (!tokens.next().equals(";"))
+				String tok = tokens.next();
+				if (!tok.equals(";"))
 					throw new InvalidSQLException("INSERT must end with a semicolon");
 
 				tableToInsert.insert(newRow);
@@ -421,12 +418,11 @@ public class SQLParser {
 					if (!tokens.next().equals("="))
 						throw new InvalidSQLException("Attribute must be separated from value with an =");
 
-					String valStr = tokens.next();
 					Value newVal = parseToValue(tokens, attr);
 					updates.put(attr, newVal);
 
-					String tok = tokens.next();
-					switch (tok) {
+					String tokk = tokens.next();
+					switch (tokk) {
 					case ",":
 						hasNextAttrVal = true;
 						break;
@@ -441,9 +437,7 @@ public class SQLParser {
 				// Parse WHERE clause (condition list)
 
 				Conditions updateConditions = parseConditionList(tokens, updateTables);
-
 				Rows rowsToUpdate = tableToUpdate.rows.getAll(updateConditions);
-
 				for (Row row : rowsToUpdate) {
 					for (Attribute attr : updates.keySet()) {
 						row.set(attr, updates.get(attr));
@@ -482,38 +476,27 @@ public class SQLParser {
 	}
 
 	private static String parseToQuotedChar(Scanner tokens) throws InvalidSQLException {
-
-		// Consume anything... spaces or whatever, before the opening single quote
-		while (true) {
-			char c = tokens.findInLine(".").charAt(0);
-			if (c == '\'') break;
-			else continue;
-		}
-		
-		/*
-		char firstChar = tokens.findInLine(".").charAt(0);
-		if (firstChar != '\'')
-			throw new InvalidSQLException("Character value must be wrapped in single quotes.");
-			*/
 		StringBuilder sb = new StringBuilder();
-
-		if (!tokens.hasNextByte()) {
-			throw new InvalidSQLException("Single quote found where whole quoted char value expected.");
-		} else {
-
-			while (tokens.hasNextByte()) {
-				char c = tokens.next(".").charAt(0);
+		boolean sawFirstQuote = false;
+		bigloop:
+		while (tokens.hasNext()) {
+			String tok  = tokens.next();
+			for (char c : tok.toCharArray()) {
 				if (c == '\'') {
-					return sb.toString();
+					if (sawFirstQuote) {
+						break bigloop;
+					} else {
+						sawFirstQuote = true;
+					}
+				} else if (!sawFirstQuote) {
+					throw new InvalidSQLException("Char value not wrapped in single quotes");
 				} else {
 					sb.append(c);
 				}
 			}
+			sb.append(" ");
 		}
-		
-		// If we reach here, we didn't return after finding closing quote
-		throw new InvalidSQLException("Char value never terminated by closing single quote.");
-
+		return sb.toString();
 	}
 
 	private static Value parseToValue(Scanner tokens, Attribute attr) throws InvalidSQLException {
@@ -558,11 +541,10 @@ public class SQLParser {
 			// TODO: Input validation??
 			String attrName = tokens.next();
 			String opStr = tokens.next();
-			String valStr = tokens.next();
 
 			Attribute attr = null;
 			Value val = null;
-			// Find the attribute with the given name
+			// Find the attribute with the given name. Search through EVERY table.
 			for (String selectedTableName : selectedTables) {
 				Table selectedTable = null;
 				try {
@@ -573,23 +555,7 @@ public class SQLParser {
 				for (Attribute a : selectedTable.getAttributes()) {
 					if (a.getName().equals(attrName)) {
 						attr = a;
-						try {
-							switch (a.getType()) {
-							case CHAR:
-								if (valStr.charAt(0) != '\'' || valStr.charAt(valStr.length() - 1) != '\'')
-									throw new InvalidSQLException("Char value not bound by single quotes");
-								val = new CharValue(valStr.substring(1, valStr.length() - 1));
-								break;
-							case DECIMAL:
-								val = new DecValue(Double.valueOf(valStr));
-								break;
-							case INT:
-								val = new IntValue(Integer.valueOf(valStr));
-								break;
-							}
-						} catch (NumberFormatException e) {
-							throw new InvalidSQLException(valStr + " is not a properly formatted number");
-						}
+						val = parseToValue(tokens, attr);
 					}
 				}
 				if (attr == null)
