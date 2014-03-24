@@ -1,3 +1,4 @@
+package rdbms;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,7 +24,7 @@ public class Table {
 		tables.add(t);
 	}
 	
-	static void dropEverything() {
+	public static void dropEverything() {
 		tables.clear();
 	}
 	
@@ -92,7 +93,7 @@ public class Table {
 		Conditions cond = new Conditions();
 		int i = 0;
 		for (Attribute a : pk) {
-			cond.add(a, Conditions.Operator.EQUAL, newRowPKValues[i]);
+			cond.add(a, Operator.EQUAL, newRowPKValues[i]);
 			i++;
 		}
 		if (rows.getAll(cond).size() > 0)

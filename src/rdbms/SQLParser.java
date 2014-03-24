@@ -1,3 +1,4 @@
+package rdbms;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +11,118 @@ import java.util.regex.Pattern;
 
 // Phase 0.1.  All (yes, all) tokens must be separated by spaces, including commas and parens.
 public class SQLParser {
+	
+	private final static String HELP_CREATE = "This command has the form:\n" +
+			"\n" +
+			"CREATE TABLE table_name ( attribute_1 attribute1_type CHECK (constraint1),\n" +
+			"attribute_2 attribute2_type, …, PRIMARY KEY ( attribute_1, attribute_2 ), FOREIGN\n" +
+			"KEY ( attribute_y ) REFERENCES table_x ( attribute_t ), FOREIGN KEY\n" +
+			"( attribute_w ) REFERENCES table_y ( attribute_z )... );\n" +
+			"\n" +
+			"The “CREATE TABLE” token is followed by any number of attribute\n" +
+			"name – attribute type pairs separated by commas. Each attribute\n" +
+			"name – attribute type pair can optionally be followed by a\n" +
+			"constraint specified using the keyword “CHECK” followed by a\n" +
+			"domain constraint in one of the forms specified in Table 3,\n" +
+			"enclosed in parentheses. This is followed by the token “PRIMARY\n" +
+			"KEY” and a list of attribute names separated by commas, enclosed\n" +
+			"in parentheses. Note that the specification of the primary key\n" +
+			"constraint is mandatory in this project and will always follow\n" +
+			"the listing of attributes. After the primary key constraint, the\n" +
+			"command should accept an optional list of foreign key constraints\n" +
+			"specified with the token “FOREIGN KEY” followed by an attribute\n" +
+			"name enclosed in parentheses, followed by the keyword\n" +
+			"“REFERENCES”, a table name and an attribute name enclosed in\n" +
+			"parentheses.  Multiple foreign key constraints are separated by\n" +
+			"commas.\n";
+	
+	private final static String HELP_DROP = "This command has the form:\n" +
+			"\n" +
+			"DROP TABLE table_name;\n" +
+			"\n" +
+			"The “DROP TABLE” token is followed by a table name.\n";
+	
+	private final static String HELP_SELECT = "This command has the form:\n" +
+			"\n" +
+			"SELECT attribute_list FROM table_list WHERE condition_list;\n" +
+			"\n" +
+			"The token “SELECT” is followed by an attribute list, followed by the token “FROM”\n" +
+			"and a table name list. This is followed by an optional “WHERE” keyword and\n" +
+			"condition list. For simplicity, you are only asked to implement an attribute list\n" +
+			"consisting of attribute names separated by commas and not using the dot notation,\n" +
+			"in addition to “*”, which stands for all attributes. You can also assume that no\n" +
+			"attributes of different tables will have the same name. The table list will also be a\n" +
+			"simple list of table names separated by commas. The condition list has the following\n" +
+			"format:\n" +
+			"\n" +
+			"attribute1 operator value1\n" +
+			"\n" +
+			"OR\n" +
+			"\n" +
+			"attribute1 operator value1 AND/OR attribute2 operator value2 AND/OR attribute3 operator value3…\n" +
+			"\n" +
+			"The operator can be any of “=”, “!=”, “<”, “>”, “<=”, “>=”.\n" +
+			"\n" +
+			"If there are multiple conjunction/disjunction operators in the\n" +
+			"predicate, they must all be the same operator (i.e. there can not\n" +
+			"be AND and OR operators mixed in the same condition). Hence, the\n" +
+			"conditions do not need to be enclosed in parentheses. The values\n" +
+			"in the conditions can either be a constant value or the name of\n" +
+			"another attribute.\n";
+	
+	private static final String HELP_INSERT = "This command has the form:\n" +
+			"\n" +
+			"INSERT INTO table_name VALUES ( val1, val2, … );\n" +
+			"\n" +
+			"The “INSERT INTO” token is followed by a table name, followed by\n" +
+			"the token “VALUES” and a list of values separated by commas\n" +
+			"enclosed in parentheses. Each value should be either a\n" +
+			"number (integer or decimal) or a string enclosed in single\n" +
+			"quotes. The values listed are inserted into the table in the same\n" +
+			"order that they are specified, i.e. the first value corresponds\n" +
+			"to the value of the first attribute, the second value corresponds\n" +
+			"to the value of the second attribute etc.\n";
+	
+	private static final String HELP_DELETE = "This command has the form:\n" +
+			"\n" +
+			"DELETE FROM table_name WHERE condition_list;\n" +
+			"\n" +
+			"The “DELETE FROM” token is followed by a table name, followed by the optional\n" +
+			"“WHERE” keyword and a condition list. The condition list has the following format:\n" +
+			"\n" +
+			"attribute1 operator value1\n" +
+			"OR\n" +
+			"attribute1 operator value1 AND/OR attribute2 operator value2 AND/OR attribute3 operator value3…\n" +
+			"\n" +
+			"The operator can be any of “=”, “!=”, “<”, “>”, “<=”, “>=”.\n" +
+			"\n" +
+			"If there are multiple conjunction/disjunction operators in the\n" +
+			"predicate, they must all be the same operator (i.e. there will\n" +
+			"not be AND and OR operators mixed in the same condition). Hence,\n" +
+			"the conditions do not need to be enclosed in parentheses.\n";
+	
+	private static final String HELP_UPDATE = "This command has the form:\n" +
+			"\n" +
+			"UPDATE table_name SET attr1 = val1, attr2 = val2… WHERE condition_list;\n" +
+			"\n" +
+			"The “UPDATE” token is followed by a table name, which is followed by the token\n" +
+			"“SET” and a list of attribute name=attribute value pairs separated by commas. This\n" +
+			"is followed by an optional “WHERE” token and a condition list in the same form as\n" +
+			"the condition list in the DELETE command.\n";
+	
+	private static final String HELP_HELP = "You may find information about the database in these ways:\n" +
+			"\n" +
+			"HELP TABLES; - to list all tables visible to you\n" +
+			"HELP DESCRIBE table_name; - to describe the schema of a table\n" +
+			"\n" +
+			"Or to get help on commands, type:\n" +
+			"\n" +
+			"HELP CREATE TABLE\n" +
+			"HELP DROP TABLE\n" +
+			"HELP SELECT\n" +
+			"HELP INSERT\n" +
+			"HELP DELETE\n" +
+			"HELP UPDATE\n";
 
 	private void validateAttrNameOrDie(String attr) throws InvalidSQLException {
 		if (!Attribute.validName(attr))
@@ -42,6 +155,20 @@ public class SQLParser {
 		statement = pad(statement, ";");
 		statement = pad(statement, "\\(");
 		statement = pad(statement, "\\)");
+		
+		// Pad all relational operators
+		statement = pad(statement, "=");
+		statement = pad(statement, "!=");
+		statement = pad(statement, ">");
+		statement = pad(statement, "<");
+		statement = pad(statement, ">=");
+		statement = pad(statement, "<=");
+		
+		// Pad all arithmetic operators
+		statement = pad(statement, "*");
+		statement = pad(statement, "/");
+		statement = pad(statement, "+");
+		statement = pad(statement, "-");
 
 		Scanner tokens = new Scanner(statement);
 		String command = tokens.next();
@@ -70,9 +197,6 @@ public class SQLParser {
 
 				boolean hasNextAttribute = true;
 				while (hasNextAttribute) {
-					// Initialize to null; only needed if there is a constraint
-					// in the statement
-					String constraint = null;
 
 					// Only needed if there is a char type attribute in the
 					// statement
@@ -85,7 +209,7 @@ public class SQLParser {
 						if (!tokens.next().equals("KEY"))
 							throw new InvalidSQLException("PRIMARY must be followed by KEY");
 						hasNextAttribute = false;
-						break;
+						break; // exit attribute list
 					}
 
 					String attrTypeStr = tokens.next();
@@ -110,6 +234,18 @@ public class SQLParser {
 					} else {
 						throw new InvalidSQLException("Invalid attribute type: " + attrTypeStr);
 					}
+					
+					// Create new attribute object
+					Attribute newAttr = null;
+					try {
+						if (attrType.equals(Attribute.Type.CHAR)) {
+							newAttr = new Attribute(attrName, attrType, charLen);
+						} else {
+							newAttr = new Attribute(attrName, attrType);
+						}
+					} catch (InvalidAttributeException e) {
+						throw new InvalidSQLException("Invalid SQL: " + e.getMessage());
+					}
 
 					// Detect either comma for next attr, or constraint, or
 					// close paren to end attr list
@@ -126,29 +262,26 @@ public class SQLParser {
 						// Begin parsing constraint of form: ( constraint )
 						if (!tokens.next().equals("("))
 							throw new InvalidSQLException("Invalid argument list");
-						constraint = tokens.next();
+						// parse constraint list
+						boolean hasNextConstraint = true;
+						while (hasNextConstraint) {
+							// Next token must be name of attribute we're working on
+							if (!tokens.next().equals(attrName))
+								throw new InvalidSQLException("Constraints must be specified on own attribute only");
+							// Get the operator
+							String constOp = tokens.next();
+							Operator op = Operator.fromString(constOp);
+							if (op == null) throw new InvalidSQLException("Operator must be one of " + Operator.values());
+							Value val = parseToValue(tokens, newAttr);
+							newAttr.addConstraint(new Constraint(op, val));
+						}
 						if (!tokens.next().equals(")"))
 							throw new InvalidSQLException("Invalid argument list");
 						break;
 					default:
 						throw new InvalidSQLException("Invalid argument list");
 					}
-
-					Attribute newAttr = null;
-					// Create new attribute object
-					try {
-						if (attrType.equals(Attribute.Type.CHAR)) {
-							newAttr = new Attribute(attrName, attrType, charLen);
-						} else {
-							newAttr = new Attribute(attrName, attrType);
-						}
-					} catch (InvalidAttributeException e) {
-						throw new InvalidSQLException("Invalid SQL: " + e.getMessage());
-					}
-
-					if (constraint != null) {
-						newAttr.setConstraint(new Attribute.Constraint(constraint));
-					}
+					
 					attributes.add(newAttr);
 
 				}
@@ -256,6 +389,8 @@ public class SQLParser {
 				System.out.println("Table dropped successfully");
 				break;
 			case "SELECT":
+				// TODO: The values in the conditions can either be a constant value or the name of another attribute.
+				
 				boolean selectAll = false;
 				boolean whereClause = false;
 				List<String> selectedAttributes = new ArrayList<String>();
@@ -449,7 +584,53 @@ public class SQLParser {
 
 				break;
 			case "HELP":
-
+				String helpTok = null;
+				try {
+					helpTok = tokens.next();
+				} catch (NoSuchElementException e) {
+					System.out.print(HELP_HELP);
+				}
+				switch (helpTok) {
+				case "TABLES":
+					if (Table.tables.size() == 0) {
+						System.out.println("No tables found.");
+					}
+					else {
+						for (Table t : Table.tables)
+							System.out.println(t.getName());
+					}
+					if (!tokens.next().equals(";"))
+						throw new InvalidSQLException("Missing semicolon");
+					break;
+				case "DESCRIBE":
+					String tableToDescribeName = tokens.next();
+					Table tableToDescribe = Table.tables.get(tableToDescribeName);
+					// TODO: Use exact format from example??
+					System.out.println(tableToDescribe);
+					if (!tokens.next().equals(";"))
+						throw new InvalidSQLException("Missing semicolon");
+					break;
+				case "CREATE":
+					System.out.print(HELP_CREATE);
+					break;
+				case "DROP":
+					System.out.print(HELP_DROP);
+					break;
+				case "SELECT":
+					System.out.print(HELP_SELECT);
+					break;
+				case "INSERT":
+					System.out.print(HELP_INSERT);
+					break;
+				case "DELETE":
+					System.out.print(HELP_DELETE);
+					break;
+				case "UPDATE":
+					System.out.print(HELP_UPDATE);
+					break;
+				default:
+					System.err.println(HELP_HELP);
+				}
 				break;
 			case "QUIT;":
 				// TODO: Make sure all changes are committed and all resources
@@ -563,25 +744,25 @@ public class SQLParser {
 							+ " does not exist in any of the tables: " + selectedTables);
 			}
 
-			Conditions.Operator op;
+			Operator op;
 			switch (opStr) {
 			case "=":
-				op = Conditions.Operator.EQUAL;
+				op = Operator.EQUAL;
 				break;
 			case "!=":
-				op = Conditions.Operator.NOT_EQUAL;
+				op = Operator.NOT_EQUAL;
 				break;
 			case "<":
-				op = Conditions.Operator.LESS;
+				op = Operator.LESS;
 				break;
 			case ">":
-				op = Conditions.Operator.GREATER;
+				op = Operator.GREATER;
 				break;
 			case "<=":
-				op = Conditions.Operator.GREATER_OR_EQUAL;
+				op = Operator.GREATER_OR_EQUAL;
 				break;
 			case ">=":
-				op = Conditions.Operator.LESS_OR_EQUAL;
+				op = Operator.LESS_OR_EQUAL;
 				break;
 			default:
 				throw new InvalidSQLException(opStr + " is not a valid operator");

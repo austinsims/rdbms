@@ -1,3 +1,4 @@
+package rdbms;
 
 public class IntegrityException extends Exception {
 	public IntegrityException(String m) {

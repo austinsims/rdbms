@@ -1,4 +1,7 @@
+package rdbms;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -10,21 +13,10 @@ public class Attribute {
 		DECIMAL
 	}
 	
-	public static class Constraint {
-		String condition;
-		public Constraint(String condition) {
-			this.condition = condition;
-		}
-		public boolean verify() {
-			// TODO: implement verify method of Constraint, Attribute's inner class
-			return true;
-		}
-	}
-	
 	String name;
 	Type type;
 	int charLen;
-	Constraint constraint;
+	List<Constraint> constraints;
 	
 	/**
 	 * Construct either an INT or a DECIMAL
@@ -34,6 +26,7 @@ public class Attribute {
 	public Attribute(String name, Type type) {
 		this.name = name;
 		this.type = type;
+		this.constraints = new ArrayList<Constraint>();
 	}
 	
 	
@@ -42,10 +35,19 @@ public class Attribute {
 		this.name = name;
 		this.type = type;
 		this.charLen = charLen;
+		this.constraints = new ArrayList<Constraint>();
 	}
 	
-	public void setConstraint(Constraint c) {
-		this.constraint = c;
+	public void addConstraint(Constraint c) {
+		this.constraints.add(c);
+	}
+	
+	public boolean checkConstraints(Value v) {
+		boolean pass = true;
+		for (Constraint constr : constraints) {
+			pass = pass && constr.check(v);
+		}
+		return pass;
 	}
 	
 	public String toString() {

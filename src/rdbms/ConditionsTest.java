@@ -1,3 +1,4 @@
+package rdbms;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
@@ -34,21 +35,21 @@ public class ConditionsTest {
 		Arguments args = new Arguments();
 		
 		// Age == 22
-		cond.add(age, Conditions.Operator.EQUAL, new IntValue(22));	
+		cond.add(age, Operator.EQUAL, new IntValue(22));	
 		assertTrue(cond.test(row));
 		
 		cond = new Conditions();
 		args = new Arguments();
 		
 		// Name < 'Lucy'
-		cond.add(name, Conditions.Operator.LESS, new CharValue("Lucy"));
+		cond.add(name, Operator.LESS, new CharValue("Lucy"));
 		assertTrue(cond.test(row));
 		
 		cond = new Conditions();
 		args = new Arguments();
 		
 		// Salary > 20000.0
-		cond.add(salary, Conditions.Operator.GREATER, new DecValue(20000.0));
+		cond.add(salary, Operator.GREATER, new DecValue(20000.0));
 		assertTrue(cond.test(row));
 		
 	}

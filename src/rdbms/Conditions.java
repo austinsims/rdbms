@@ -1,15 +1,7 @@
+package rdbms;
 import java.util.ArrayList;
 
 public class Conditions extends ArrayList<Conditions.Condition> {
-	
-	public enum Operator {
-		EQUAL,
-		NOT_EQUAL,
-		LESS,
-		GREATER,
-		LESS_OR_EQUAL,
-		GREATER_OR_EQUAL
-	}
 	
 	class Condition {
 		Attribute attr;
@@ -59,26 +51,7 @@ public class Conditions extends ArrayList<Conditions.Condition> {
 		boolean pass = true;
 		for (Condition cond : this) {
 			Value rowValue = row.get(cond.attr);
-			switch (cond.operator) {
-			case EQUAL:
-				pass = pass && rowValue.equals(cond.value);
-				break;
-			case GREATER:
-				pass = pass && rowValue.greaterThan(cond.value);
-				break;
-			case GREATER_OR_EQUAL:
-				pass = pass && rowValue.equals(cond.value) || rowValue.greaterThan(cond.value);
-				break;
-			case LESS:
-				pass = pass && rowValue.lessThan(cond.value);
-				break;
-			case LESS_OR_EQUAL:
-				pass = pass && rowValue.lessThan(cond.value) || rowValue.equals(cond.value);
-				break;
-			case NOT_EQUAL:
-				pass = pass && !rowValue.equals(cond.value);
-				break;
-			}
+			pass = pass && Operator.evaluateExpression(rowValue, cond.operator, cond.value);
 		}
 		return pass;
 	}	

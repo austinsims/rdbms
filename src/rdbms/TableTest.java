@@ -1,3 +1,4 @@
+package rdbms;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -140,7 +141,7 @@ public class TableTest {
 		expected.add(malibu);
 		
 		Conditions conditions = new Conditions();
-		conditions.add(schema.get(0), Conditions.Operator.EQUAL, new CharValue("Chevrolet"));
+		conditions.add(schema.get(0), Operator.EQUAL, new CharValue("Chevrolet"));
 		List<String> selAttr = new ArrayList<String>();
 		for (Attribute a : schema) {
 			selAttr.add(a.getName());
@@ -168,7 +169,7 @@ public class TableTest {
 		expected.add(malibu.project(pk));
 		
 		Conditions conditions = new Conditions();
-		conditions.add(schema.get(0), Conditions.Operator.EQUAL, new CharValue("Chevrolet"));
+		conditions.add(schema.get(0), Operator.EQUAL, new CharValue("Chevrolet"));
 		List<String> selAttr = new ArrayList<String>();
 		for (Attribute a : pk) {
 			selAttr.add(a.getName());
