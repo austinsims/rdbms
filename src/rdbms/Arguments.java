@@ -3,6 +3,11 @@ import java.util.LinkedList;
 
 
 public class Arguments extends LinkedList<Arguments.Argument> {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3632003797175057452L;
+
 	class Argument {
 		Attribute attr;
 		Value value;

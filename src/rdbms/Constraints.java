@@ -3,6 +3,11 @@ package rdbms;
 import java.util.ArrayList;
 
 public class Constraints extends ArrayList<Constraint> {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2288558564426955955L;
+
 	enum Operator {
 		AND, OR,
 	}

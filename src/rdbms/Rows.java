@@ -1,10 +1,12 @@
 package rdbms;
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
-import java.util.List;
 
 
 public class Rows extends LinkedHashSet<Row> {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1428923157979094885L;
 	Attributes schema;
 	
 	public Rows(Attributes schema) {

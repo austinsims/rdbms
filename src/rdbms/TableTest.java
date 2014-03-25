@@ -204,6 +204,60 @@ public class TableTest {
 		}
 		
 	}
+	
+	@Test
+	public void testSimpleJoin() throws InvalidAttributeException, SchemaViolationException {
+		Attributes employeeSchema = new Attributes();
+		Attribute ename = new Attribute("ename", Attribute.Type.CHAR, 50);
+		Attribute elocation = new Attribute("elocation", Attribute.Type.CHAR, 50);
+		employeeSchema.add(ename);
+		employeeSchema.add(elocation);
+		Attributes empPk = new Attributes();
+		empPk.add(employeeSchema.get(0));
+		Table employee = new Table("employee", employeeSchema, empPk);
+		Table.insertIntoDB(employee);
+		employee.insert(new Row(employeeSchema, new CharValue("Jeff"), new CharValue("Chicago")));
+        employee.insert(new Row(employeeSchema, new CharValue("Sally"), new CharValue("New York")));
+        employee.insert(new Row(employeeSchema, new CharValue("Jim"), new CharValue("LA")));
+        employee.insert(new Row(employeeSchema, new CharValue("Ron"), new CharValue("Chicago")));
+        employee.insert(new Row(employeeSchema, new CharValue("Jack"), new CharValue("LA")));
+        employee.insert(new Row(employeeSchema, new CharValue("Ryan"), new CharValue("New York")));
+        
+		Attributes locationSchema = new Attributes();
+		Attribute lname = new Attribute("lname", Attribute.Type.CHAR, 50);
+		Attribute lsales = new Attribute("lsales", Attribute.Type.DECIMAL);
+		locationSchema.add(lname);
+		locationSchema.add(lsales);
+		Attributes locPk = new Attributes();
+		locPk.add(locationSchema.get(0));
+		Table location = new Table("location", locationSchema, locPk);
+		Table.insertIntoDB(location);
+		location.insert(new Row(locationSchema, new CharValue("Chicago"), new DecValue(3)));
+        location.insert(new Row(locationSchema, new CharValue("New York"), new DecValue(1)));
+        location.insert(new Row(locationSchema, new CharValue("LA"), new DecValue(2)));
+        
+        Conditions joinCond = new Conditions();
+        joinCond.add(elocation, Operator.EQUAL, lname);
+        
+        Attributes joinSchema = new Attributes();
+        joinSchema.add(ename);
+        joinSchema.add(lsales);
+        
+        Rows expected = new Rows(joinSchema);
+        expected.add(new Row(joinSchema, new CharValue("Jeff"), new DecValue(3)));
+    	expected.add(new Row(joinSchema, new CharValue("Sally"), new DecValue(1)));
+    	expected.add(new Row(joinSchema, new CharValue("Jim"), new DecValue(2)));
+    	expected.add(new Row(joinSchema, new CharValue("Ron"), new DecValue(3)));
+        expected.add(new Row(joinSchema, new CharValue("Jack"), new DecValue(2)));
+        expected.add(new Row(joinSchema, new CharValue("Ryan"), new DecValue(1)));
+        
+        Rows actual = Table.select(
+        		Arrays.asList(new String[] {"ename", "lsales"}),
+        		Arrays.asList(new String[] {"employee", "location"}),
+        		joinCond); 
+        
+        assertEquals(expected, actual);
+	}
 
 
 }

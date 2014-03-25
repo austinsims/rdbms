@@ -3,6 +3,11 @@ import java.util.ArrayList;
 
 public class Conditions extends ArrayList <Condition> {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8951750080003785481L;
+
 	public boolean add(Attribute attr, Operator op, Value value) {
 		return add(new ValueCondition(attr, op, value));
 	}

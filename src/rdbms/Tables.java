@@ -3,6 +3,11 @@ import java.util.HashSet;
 
 
 public class Tables extends HashSet<Table> {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7629053190541454720L;
+
 	public boolean contains(String name) {
 		for (Table t : this)
 			if (t.getName().equals(name)) return true;

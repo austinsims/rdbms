@@ -1,10 +1,6 @@
 package rdbms;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
-
-import com.sun.org.apache.xml.internal.utils.UnImplNode;
 
 
 public class Table {
@@ -103,20 +99,23 @@ public class Table {
 	}
 
 	public static Rows select(List<String> selectedAttributes, List<String> selectedTables, Conditions conditions) throws SchemaViolationException {
-		if (selectedTables.size() > 1) throw new RuntimeException("Sorry, join is not yet implemented");
-		
 		// if no Conditions specified, create a new one with no conditions (always passes)
 		if (conditions == null)
 			conditions =  new Conditions();
-
-		Table t = Table.tables.get(selectedTables.get(0));
+		
+		Table first = Table.tables.get(selectedTables.get(0));
+		Rows crossProduct = first.rows;
+		for (int i=1; i<selectedTables.size(); i++) {
+			Table next = Table.tables.get(selectedTables.get(1));
+			crossProduct = crossProduct.cross(next.rows);
+		}
 		
 		Attributes subschema = new Attributes();
 		for (String attrName : selectedAttributes) {
-			subschema.add(t.schema.get(attrName));
+			subschema.add(crossProduct.schema.get(attrName));
 		}
 		
-		Rows result = t.rows.getAll(conditions).project(subschema);
+		Rows result = crossProduct.getAll(conditions).project(subschema);
 		
 		return result;
 	}
