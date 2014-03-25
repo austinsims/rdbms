@@ -15,24 +15,24 @@ public class SQLParser {
 	private final static String HELP_CREATE = "This command has the form:\n" +
 			"\n" +
 			"CREATE TABLE table_name ( attribute_1 attribute1_type CHECK (constraint1),\n" +
-			"attribute_2 attribute2_type, …, PRIMARY KEY ( attribute_1, attribute_2 ), FOREIGN\n" +
+			"attribute_2 attribute2_type, ï¿½, PRIMARY KEY ( attribute_1, attribute_2 ), FOREIGN\n" +
 			"KEY ( attribute_y ) REFERENCES table_x ( attribute_t ), FOREIGN KEY\n" +
 			"( attribute_w ) REFERENCES table_y ( attribute_z )... );\n" +
 			"\n" +
-			"The “CREATE TABLE” token is followed by any number of attribute\n" +
-			"name – attribute type pairs separated by commas. Each attribute\n" +
-			"name – attribute type pair can optionally be followed by a\n" +
-			"constraint specified using the keyword “CHECK” followed by a\n" +
+			"The ï¿½CREATE TABLEï¿½ token is followed by any number of attribute\n" +
+			"name ï¿½ attribute type pairs separated by commas. Each attribute\n" +
+			"name ï¿½ attribute type pair can optionally be followed by a\n" +
+			"constraint specified using the keyword ï¿½CHECKï¿½ followed by a\n" +
 			"domain constraint in one of the forms specified in Table 3,\n" +
-			"enclosed in parentheses. This is followed by the token “PRIMARY\n" +
-			"KEY” and a list of attribute names separated by commas, enclosed\n" +
+			"enclosed in parentheses. This is followed by the token ï¿½PRIMARY\n" +
+			"KEYï¿½ and a list of attribute names separated by commas, enclosed\n" +
 			"in parentheses. Note that the specification of the primary key\n" +
 			"constraint is mandatory in this project and will always follow\n" +
 			"the listing of attributes. After the primary key constraint, the\n" +
 			"command should accept an optional list of foreign key constraints\n" +
-			"specified with the token “FOREIGN KEY” followed by an attribute\n" +
+			"specified with the token ï¿½FOREIGN KEYï¿½ followed by an attribute\n" +
 			"name enclosed in parentheses, followed by the keyword\n" +
-			"“REFERENCES”, a table name and an attribute name enclosed in\n" +
+			"ï¿½REFERENCESï¿½, a table name and an attribute name enclosed in\n" +
 			"parentheses.  Multiple foreign key constraints are separated by\n" +
 			"commas.\n";
 	
@@ -40,17 +40,17 @@ public class SQLParser {
 			"\n" +
 			"DROP TABLE table_name;\n" +
 			"\n" +
-			"The “DROP TABLE” token is followed by a table name.\n";
+			"The ï¿½DROP TABLEï¿½ token is followed by a table name.\n";
 	
 	private final static String HELP_SELECT = "This command has the form:\n" +
 			"\n" +
 			"SELECT attribute_list FROM table_list WHERE condition_list;\n" +
 			"\n" +
-			"The token “SELECT” is followed by an attribute list, followed by the token “FROM”\n" +
-			"and a table name list. This is followed by an optional “WHERE” keyword and\n" +
+			"The token ï¿½SELECTï¿½ is followed by an attribute list, followed by the token ï¿½FROMï¿½\n" +
+			"and a table name list. This is followed by an optional ï¿½WHEREï¿½ keyword and\n" +
 			"condition list. For simplicity, you are only asked to implement an attribute list\n" +
 			"consisting of attribute names separated by commas and not using the dot notation,\n" +
-			"in addition to “*”, which stands for all attributes. You can also assume that no\n" +
+			"in addition to ï¿½*ï¿½, which stands for all attributes. You can also assume that no\n" +
 			"attributes of different tables will have the same name. The table list will also be a\n" +
 			"simple list of table names separated by commas. The condition list has the following\n" +
 			"format:\n" +
@@ -59,9 +59,9 @@ public class SQLParser {
 			"\n" +
 			"OR\n" +
 			"\n" +
-			"attribute1 operator value1 AND/OR attribute2 operator value2 AND/OR attribute3 operator value3…\n" +
+			"attribute1 operator value1 AND/OR attribute2 operator value2 AND/OR attribute3 operator value3ï¿½\n" +
 			"\n" +
-			"The operator can be any of “=”, “!=”, “<”, “>”, “<=”, “>=”.\n" +
+			"The operator can be any of ï¿½=ï¿½, ï¿½!=ï¿½, ï¿½<ï¿½, ï¿½>ï¿½, ï¿½<=ï¿½, ï¿½>=ï¿½.\n" +
 			"\n" +
 			"If there are multiple conjunction/disjunction operators in the\n" +
 			"predicate, they must all be the same operator (i.e. there can not\n" +
@@ -72,10 +72,10 @@ public class SQLParser {
 	
 	private static final String HELP_INSERT = "This command has the form:\n" +
 			"\n" +
-			"INSERT INTO table_name VALUES ( val1, val2, … );\n" +
+			"INSERT INTO table_name VALUES ( val1, val2, ï¿½ );\n" +
 			"\n" +
-			"The “INSERT INTO” token is followed by a table name, followed by\n" +
-			"the token “VALUES” and a list of values separated by commas\n" +
+			"The ï¿½INSERT INTOï¿½ token is followed by a table name, followed by\n" +
+			"the token ï¿½VALUESï¿½ and a list of values separated by commas\n" +
 			"enclosed in parentheses. Each value should be either a\n" +
 			"number (integer or decimal) or a string enclosed in single\n" +
 			"quotes. The values listed are inserted into the table in the same\n" +
@@ -87,14 +87,14 @@ public class SQLParser {
 			"\n" +
 			"DELETE FROM table_name WHERE condition_list;\n" +
 			"\n" +
-			"The “DELETE FROM” token is followed by a table name, followed by the optional\n" +
-			"“WHERE” keyword and a condition list. The condition list has the following format:\n" +
+			"The ï¿½DELETE FROMï¿½ token is followed by a table name, followed by the optional\n" +
+			"ï¿½WHEREï¿½ keyword and a condition list. The condition list has the following format:\n" +
 			"\n" +
 			"attribute1 operator value1\n" +
 			"OR\n" +
-			"attribute1 operator value1 AND/OR attribute2 operator value2 AND/OR attribute3 operator value3…\n" +
+			"attribute1 operator value1 AND/OR attribute2 operator value2 AND/OR attribute3 operator value3ï¿½\n" +
 			"\n" +
-			"The operator can be any of “=”, “!=”, “<”, “>”, “<=”, “>=”.\n" +
+			"The operator can be any of ï¿½=ï¿½, ï¿½!=ï¿½, ï¿½<ï¿½, ï¿½>ï¿½, ï¿½<=ï¿½, ï¿½>=ï¿½.\n" +
 			"\n" +
 			"If there are multiple conjunction/disjunction operators in the\n" +
 			"predicate, they must all be the same operator (i.e. there will\n" +
@@ -103,11 +103,11 @@ public class SQLParser {
 	
 	private static final String HELP_UPDATE = "This command has the form:\n" +
 			"\n" +
-			"UPDATE table_name SET attr1 = val1, attr2 = val2… WHERE condition_list;\n" +
+			"UPDATE table_name SET attr1 = val1, attr2 = val2ï¿½ WHERE condition_list;\n" +
 			"\n" +
-			"The “UPDATE” token is followed by a table name, which is followed by the token\n" +
-			"“SET” and a list of attribute name=attribute value pairs separated by commas. This\n" +
-			"is followed by an optional “WHERE” token and a condition list in the same form as\n" +
+			"The ï¿½UPDATEï¿½ token is followed by a table name, which is followed by the token\n" +
+			"ï¿½SETï¿½ and a list of attribute name=attribute value pairs separated by commas. This\n" +
+			"is followed by an optional ï¿½WHEREï¿½ token and a condition list in the same form as\n" +
 			"the condition list in the DELETE command.\n";
 	
 	private static final String HELP_HELP = "You may find information about the database in these ways:\n" +
@@ -129,8 +129,8 @@ public class SQLParser {
 			throw new InvalidSQLException(attr + " is not a valid attribute name");
 	}
 
-	private static String pad(String s, String ch) {
-		return s.replaceAll("(?x) " + String.format("%s         ", ch) + // Replace
+	private static String pad(String string, String pattern, String character) {
+		return string.replaceAll("(?x) " + String.format("%s         ", pattern) + // Replace
 																			// ch
 				"(?=        " + // Followed by
 				"  (?:      " + // Start a non-capture group
@@ -144,8 +144,12 @@ public class SQLParser {
 				"  $        " + // Till the end (This is necessary, else every _
 								// will satisfy the condition)
 				")          ", // End look-ahead
-				String.format(" %s ", ch)); // Replace with " , "
+				String.format(" %s ", character)); // Replace with " ch "
 
+	}
+	
+	private static String pad(String string, String character) {
+		return pad(string, character, character);
 	}
 
 	public static int parse(String statement) throws InvalidSQLException {
@@ -157,7 +161,7 @@ public class SQLParser {
 		statement = pad(statement, "\\)");
 		
 		// Pad all relational operators
-		statement = pad(statement, "=");
+		statement = pad(statement, "[^!]=", "=");
 		statement = pad(statement, "!=");
 		statement = pad(statement, ">");
 		statement = pad(statement, "<");
@@ -165,9 +169,9 @@ public class SQLParser {
 		statement = pad(statement, "<=");
 		
 		// Pad all arithmetic operators
-		statement = pad(statement, "*");
+		statement = pad(statement, "\\*");
 		statement = pad(statement, "/");
-		statement = pad(statement, "+");
+		statement = pad(statement, "\\+");
 		statement = pad(statement, "-");
 
 		Scanner tokens = new Scanner(statement);
@@ -214,11 +218,11 @@ public class SQLParser {
 
 					String attrTypeStr = tokens.next();
 					Attribute.Type attrType;
-					if (attrTypeStr.equals("int")) {
+					if (attrTypeStr.equalsIgnoreCase("int")) {
 						attrType = Attribute.Type.INT;
-					} else if (attrTypeStr.equals("decimal")) {
+					} else if (attrTypeStr.equalsIgnoreCase("decimal")) {
 						attrType = Attribute.Type.DECIMAL;
-					} else if (attrTypeStr.equals("char")) {
+					} else if (attrTypeStr.equalsIgnoreCase("char")) {
 						try {
 							if (!tokens.next().equals("("))
 								throw new InvalidSQLException("must specify char ( LEN )");
@@ -265,8 +269,12 @@ public class SQLParser {
 						// parse constraint list
 						boolean hasNextConstraint = true;
 						while (hasNextConstraint) {
+							boolean and, or;
+							and = or = false;
+							
 							// Next token must be name of attribute we're working on
-							if (!tokens.next().equals(attrName))
+							String asdf = tokens.next();
+							if (!asdf.equals(attrName))
 								throw new InvalidSQLException("Constraints must be specified on own attribute only");
 							// Get the operator
 							String constOp = tokens.next();
@@ -274,9 +282,42 @@ public class SQLParser {
 							if (op == null) throw new InvalidSQLException("Operator must be one of " + Operator.values());
 							Value val = parseToValue(tokens, newAttr);
 							newAttr.addConstraint(new Constraint(op, val));
+							
+							// TODO: process next constraint... only getting first one here.  find OR and AND and all that crap
+							switch (tokens.next()) {
+							case "AND":
+								if (or)
+									throw new InvalidSQLException("AND and OR may not be mixed in a constraint");
+								else {
+									and = true;
+									newAttr.constraints.setOperator(Constraints.Operator.AND);
+								}
+								hasNextConstraint = true;
+								break;
+							case "OR":
+								if (and)
+									throw new InvalidSQLException("AND and OR may not be mixed in a constraint");
+								else {
+									or = true;
+									newAttr.constraints.setOperator(Constraints.Operator.OR);
+								}
+								hasNextConstraint = true;
+								break;
+							case ")":
+								hasNextConstraint = false;
+								if (tokens.hasNext("\\)")) {
+									tokens.next();
+									hasNextAttribute = false;
+								} else if (tokens.hasNext(",")) {
+									tokens.next();
+									hasNextAttribute = true;
+								}
+								break;
+							default:
+								throw new InvalidSQLException("Constraint list for attribute " + attrName + " malformed");
+							}
 						}
-						if (!tokens.next().equals(")"))
-							throw new InvalidSQLException("Invalid argument list");
+						
 						break;
 					default:
 						throw new InvalidSQLException("Invalid argument list");
@@ -550,7 +591,8 @@ public class SQLParser {
 					String attrName = tokens.next();
 					Attribute attr = tableToUpdate.schema.get(attrName);
 
-					if (!tokens.next().equals("="))
+					String asdf = tokens.next();
+					if (!asdf.equals("="))
 						throw new InvalidSQLException("Attribute must be separated from value with an =");
 
 					Value newVal = parseToValue(tokens, attr);
@@ -642,12 +684,11 @@ public class SQLParser {
 				break;
 			} // switch
 		} catch (InvalidSQLException e) {
-			tokens.close();
-			System.err.println(e.getMessage());
-			throw e;
+			System.err.println(e.getMessage());			
 		} catch (SchemaViolationException e) {
 			System.err.println("Schema violation: " + e.getMessage());
-			e.printStackTrace();
+		} catch (NoSuchElementException e) {
+			System.err.println("Input ended unexpectedly.  Did you forget to close parens or a semicolon?");
 		} finally {
 			tokens.close();
 		}

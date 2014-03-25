@@ -16,7 +16,7 @@ public class Attribute {
 	String name;
 	Type type;
 	int charLen;
-	List<Constraint> constraints;
+	Constraints constraints;
 	
 	/**
 	 * Construct either an INT or a DECIMAL
@@ -26,7 +26,7 @@ public class Attribute {
 	public Attribute(String name, Type type) {
 		this.name = name;
 		this.type = type;
-		this.constraints = new ArrayList<Constraint>();
+		this.constraints = new Constraints(Constraints.Operator.AND);
 	}
 	
 	
@@ -35,7 +35,7 @@ public class Attribute {
 		this.name = name;
 		this.type = type;
 		this.charLen = charLen;
-		this.constraints = new ArrayList<Constraint>();
+		this.constraints = new Constraints(Constraints.Operator.AND);
 	}
 	
 	public void addConstraint(Constraint c) {
@@ -43,11 +43,7 @@ public class Attribute {
 	}
 	
 	public boolean checkConstraints(Value v) throws SchemaViolationException {
-		boolean pass = true;
-		for (Constraint constr : constraints) {
-			pass = pass && constr.check(v);
-		}
-		return pass;
+		return constraints.check(v);
 	}
 	
 	public String toString() {

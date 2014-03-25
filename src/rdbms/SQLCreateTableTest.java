@@ -51,6 +51,16 @@ public class SQLCreateTableTest {
 		SQLParser.parse("CREATE TABLE employee ( ssn int , manager_ssn int , PRIMARY KEY ( ssn ), FOREIGN KEY ( manager_ssn ) REFERENCES employee ( ssn ) );");
 	}
 	
+	@Test
+	public void domainConstraints() throws InvalidSQLException {
+		SQLParser.parse("CREATE TABLE employee ( ssn int, name char(50) CHECK(name != ''), age int CHECK(age > 0), PRIMARY KEY (ssn));");
+	}
+	
+	@Test
+	public void compoundDomainConstraints() throws InvalidSQLException {
+		SQLParser.parse("CREATE TABLE employee ( ssn int, name char(50) CHECK(name != ''), age int CHECK(age > 0 AND age < 150), PRIMARY KEY (ssn));");
+	}
+	
 	/**
 	 * Try to create a table with an illegal name
 	 */
