@@ -24,5 +24,6 @@ public class Interactive {
 				System.err.println(e.getMessage());
 			}
 		}
+		in.close();
 	}
 }

@@ -42,7 +42,7 @@ public class Attribute {
 		this.constraints.add(c);
 	}
 	
-	public boolean checkConstraints(Value v) {
+	public boolean checkConstraints(Value v) throws SchemaViolationException {
 		boolean pass = true;
 		for (Constraint constr : constraints) {
 			pass = pass && constr.check(v);

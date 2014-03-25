@@ -46,10 +46,10 @@ public class Row {
 	public void set(int index, Value element) throws SchemaViolationException {
 		// TODO Auto-generated method stub
 		Attribute attr = schema.get(index);
-		Attribute.Type elementType = element.getType();
-		Attribute.Type schemaType = attr.getType();
 		if (element.getType() != attr.getType())
 			throw new SchemaViolationException("The value " + element + " does not match the attribute type at index " + index + ", which is " + element.getType());
+		if (!attr.checkConstraints(element))
+			throw new SchemaViolationException("The value " + element + "does not meet the domain constraints for " + attr + ": " + attr.constraints);
 		values[index] = element;
 	}
 	
@@ -59,7 +59,7 @@ public class Row {
 	 */
 	public void set(Attribute attr, Value value) throws SchemaViolationException {
 		int index = schema.indexOf(attr);
-		values[index] = value;
+		set(index, value);
 	}
 	
 	public void set (Value[] values) throws SchemaViolationException {

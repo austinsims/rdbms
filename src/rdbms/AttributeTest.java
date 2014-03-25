@@ -44,5 +44,22 @@ public class AttributeTest {
 		assertFalse(Attribute.validName("123"));
 		assertFalse(Attribute.validName("Hello world!"));
 	}
+	
+	@Test
+	public void checkTestConstraints() throws SchemaViolationException {
+		Attribute testScore = new Attribute("testScore", Attribute.Type.INT);
+		testScore.addConstraint(new Constraint(Operator.GREATER_OR_EQUAL, new IntValue(0)));
+		testScore.addConstraint(new Constraint(Operator.LESS_OR_EQUAL, new IntValue(100)));
+		
+		IntValue validScore = new IntValue(60);
+		IntValue invalidScore1 = new IntValue(-50);
+		IntValue invalidScore2 = new IntValue(101);
+		IntValue invalidScore3 = new IntValue(150);
+		
+		assertTrue(testScore.checkConstraints(validScore));
+		assertFalse(testScore.checkConstraints(invalidScore1));
+		assertFalse(testScore.checkConstraints(invalidScore2));
+		assertFalse(testScore.checkConstraints(invalidScore3));
+	}
 
 }

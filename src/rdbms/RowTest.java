@@ -10,14 +10,18 @@ public class RowTest {
 
 	Attributes schema;
 	Row r1, r2, r3;
+	Attribute name;
+	Attribute age;
+	Attribute height;
 
 	@Before
 	public void setUp() throws Exception {
+		name = new Attribute("name", Attribute.Type.CHAR, 50);
+		age = new Attribute("age", Attribute.Type.INT); 
+		height = new Attribute("height", Attribute.Type.INT); 
+		
 		schema = new Attributes();
-		schema.addAll(Arrays.asList(new Attribute[] {
-				new Attribute("name", Attribute.Type.CHAR, 50),
-				new Attribute("age", Attribute.Type.INT),
-				new Attribute("height", Attribute.Type.INT) }));
+		schema.addAll(Arrays.asList(new Attribute[] { name, age, height }));
 
 		r1 = new Row(schema);
 		r1.set(0, new CharValue("Angela"));
@@ -91,5 +95,72 @@ public class RowTest {
 		}
 
 	}
+	
+	@Test
+	public void testSet() throws SchemaViolationException {
+		name.addConstraint(new Constraint(Operator.NOT_EQUAL, new CharValue("")));
+		age.addConstraint(new Constraint(Operator.GREATER, new IntValue(0)));
+		age.addConstraint(new Constraint(Operator.LESS_OR_EQUAL, new IntValue(150)));
+		height.addConstraint(new Constraint(Operator.GREATER, new IntValue(0)));
+		height.addConstraint(new Constraint(Operator.LESS_OR_EQUAL, new IntValue(272)));
+		
+		Row henry = new Row(schema);
+		henry.set(name, new CharValue("Henry"));
+		henry.set(age, new IntValue(57));
+		henry.set(height, new IntValue(185));
+		
+		// Now try some illegal values
+		try {
+			henry.set(name, new CharValue(""));
+			fail();
+		} catch (SchemaViolationException e) {
+			// Expected
+		}
+		
+		try {
+			henry.set(age, new IntValue(-5));
+			fail();
+		} catch (SchemaViolationException e) {
+			// Expected
+		}
+		
+		try {
+			henry.set(age, new IntValue(2000));
+			fail();
+		} catch (SchemaViolationException e) {
+			// Expected
+		}
+		
+		try {
+			henry.set(height, new IntValue(-5));
+			fail();
+		} catch (SchemaViolationException e) {
+			// Expected
+		}
+		
+		try {
+			henry.set(height, new IntValue(9999999));
+			fail();
+		} catch (SchemaViolationException e) {
+			// Expected
+		}
+		
+	}
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
