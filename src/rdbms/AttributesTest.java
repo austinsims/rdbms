@@ -51,4 +51,21 @@ public class AttributesTest {
 			throw e;
 		}
 	}
+	
+	@Test
+	public void testContainsASameNameAttr() {
+		Attributes sa = new Attributes();
+		sa.add(new Attribute("a", Attribute.Type.INT));
+		
+		Attributes sb1 = new Attributes();
+		sb1.add(new Attribute("b", Attribute.Type.INT));
+		
+		Attributes sb2 = new Attributes();
+		sb2.add(new Attribute("b", Attribute.Type.INT));
+		
+		assertFalse(sa.containsASameNameAttr(sb1));
+		assertFalse(sa.containsASameNameAttr(sb2));
+		assertTrue(sb1.containsASameNameAttr(sb2));
+		assertTrue(sb2.containsASameNameAttr(sb1));
+	}
 }

@@ -120,6 +120,8 @@ public class Table {
 		
 		return result;
 	}
+	
+	
 
 	public boolean insertAll(Row... all) throws SchemaViolationException {
 		boolean success = true;

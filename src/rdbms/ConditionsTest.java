@@ -12,7 +12,7 @@ public class ConditionsTest {
 	}
 
 	@Test
-	public void testTest() throws InvalidAttributeException, SchemaViolationException {
+	public void testWithValueConditions() throws InvalidAttributeException, SchemaViolationException {
 		Attributes schema = new Attributes();
 		Attribute name = new Attribute("name", Attribute.Type.CHAR, 50);
 		Attribute age = new Attribute("age", Attribute.Type.INT);
@@ -53,5 +53,78 @@ public class ConditionsTest {
 		assertTrue(cond.test(row));
 		
 	}
+	
+	@Test
+	public void testWithAttrConditions() throws InvalidAttributeException, SchemaViolationException {
+		Attributes schema = new Attributes();
+		Attribute color = new Attribute("color", Attribute.Type.CHAR, 50);
+		Attribute width = new Attribute("width", Attribute.Type.INT);
+		Attribute height = new Attribute("height", Attribute.Type.INT);
+		schema.addAll(color,width,height);
+		Attributes pk = new Attributes();
+		pk.add(color);
+				
+		Row orange = new Row(schema);
+		orange.set(new Value[] {
+				new CharValue("orange"),
+				new IntValue(10),
+				new IntValue(10),
+		});
+		
+		Row red = new Row(schema);
+		red.set(new Value[] {
+				new CharValue("red"),
+				new IntValue(10),
+				new IntValue(20),
+		});
+		
+		Row blue = new Row(schema);
+		blue.set(new Value[] {
+				new CharValue("blue"),
+				new IntValue(20),
+				new IntValue(20),
+		});
+		
+		Row green = new Row(schema);
+		green.set(new Value[] {
+				new CharValue("green"),
+				new IntValue(45),
+				new IntValue(20),
+		});
+		
+		Conditions isSquare = new Conditions();
+		isSquare.add(width, Operator.EQUAL, height);
+		
+		assertTrue(isSquare.test(orange));
+		assertTrue(isSquare.test(blue));
+		assertFalse(isSquare.test(red));
+		assertFalse(isSquare.test(green));
+		
+	}
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

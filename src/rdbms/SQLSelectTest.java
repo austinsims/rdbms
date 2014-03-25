@@ -20,19 +20,13 @@ public class SQLSelectTest {
 	}
 	
 	@Test
-	public void basic() throws Exception {
+	public void basic() throws InvalidAttributeException, SchemaViolationException, InvalidSQLException  {
         String[] expected = new String[] {"thing", "hello"};
 
-        try {
+
         	// Create a new table
         	Attributes schema = new Attributes();
-        	try {
         		schema.add(new Attribute("thing", Attribute.Type.CHAR, 50));
-        	} catch (InvalidAttributeException e) {
-        		e.printStackTrace();
-        		fail();
-        		throw e;
-        	}
         	Attributes pk = new Attributes();
         	pk.add(schema.get(0));
         	Table stuff = new Table("stuff", schema, pk);
@@ -40,21 +34,11 @@ public class SQLSelectTest {
 
         	// Insert a row into it
         	Row row = new Row(schema);
-        	try {
 				row.set(0, new CharValue("hello"));
-			} catch (SchemaViolationException e) {
-				e.printStackTrace();
-        		fail();
-        		throw e;
-			}
         	stuff.insert(row);
         	
         	// Try to retrieve from it
         	SQLParser.parse("SELECT * FROM stuff;");
-        } catch (InvalidSQLException e) {
-        	fail(e.getMessage());
-        	throw e;
-        }
 		
         StringTokenizer st = new StringTokenizer(myOut.toString());
         String[] actual = new String[st.countTokens()];
@@ -66,5 +50,5 @@ public class SQLSelectTest {
         
         assertEquals(expected, actual);
 	}
-
+	
 }

@@ -1,5 +1,7 @@
 package rdbms;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 
 
 public class Rows extends LinkedHashSet<Row> {
@@ -43,4 +45,31 @@ public class Rows extends LinkedHashSet<Row> {
 		return projection;
 	}
 	
+	public Rows cross(Rows other) throws SchemaViolationException {
+		if (schema.containsASameNameAttr(other.schema))
+			throw new SchemaViolationException("You may not join tables that contain attributes of the same name.");
+		
+		Attributes crossSchema = new Attributes();
+		crossSchema.addAll(this.schema);
+		
+		crossSchema.addAll(other.schema);
+		Rows crossProduct = new Rows(crossSchema);
+		for (Row myRow : this) {
+			for (Row otherRow : other) {
+				Row crossRow = new Row(crossSchema);
+				// Set my attributes
+				for (Attribute myAttr : this.schema) {
+					crossRow.set(myAttr, myRow.get(myAttr));
+				}
+				// Set other attributes
+				for (Attribute otherAttr : other.schema) {
+					crossRow.set(otherAttr, otherRow.get(otherAttr));
+				}
+				crossProduct.add(crossRow);
+			}
+		}
+		
+		return crossProduct;
+	}
+
 }

@@ -1,7 +1,9 @@
 package rdbms;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -81,6 +83,23 @@ public class Attributes extends LinkedHashSet<Attribute> {
 		}
 		return sb.toString();
 		// TODO: Remove trailing tab
+	}
+
+	public void addAll(Attribute... attrs) {
+		for (Attribute a : attrs)
+			add(a);
+	}
+	
+	boolean containsASameNameAttr(Attributes other) {
+		List<String> myAttrNames = new ArrayList<String>();
+		for (Attribute a : this) {
+			myAttrNames.add(a.getName());
+		}
+		for (Attribute a : other) {
+			if (myAttrNames.contains(a.getName()))
+				return true;
+		}
+		return false;
 	}
 	
 }
