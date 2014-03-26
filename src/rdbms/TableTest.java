@@ -4,6 +4,11 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -16,7 +21,7 @@ public class TableTest {
 	ByteArrayOutputStream myOut;
 	Attributes schema;
 	Attributes pk;
-	Table t;
+	Table car;
 	Row malibu, explorer;
 
 	@Before
@@ -35,8 +40,8 @@ public class TableTest {
 		pk.add(schema.get(0));
 		pk.add(schema.get(1));
 
-		t = new Table("car", schema, pk);
-		Table.insertIntoDB(t);
+		car = new Table("car", schema, pk);
+		Table.insertIntoDB(car);
 
 		malibu = new Row(schema);
 		malibu.set(new Value[] { new CharValue("Chevrolet"),
@@ -48,8 +53,8 @@ public class TableTest {
 				new CharValue("Explorer"), new IntValue(200),
 				new CharValue("green"), new DecValue(525.0) });
 
-		t.insert(malibu);
-		t.insert(explorer);
+		car.insert(malibu);
+		car.insert(explorer);
 
 	}
 
@@ -87,7 +92,7 @@ public class TableTest {
 			selectedAttributes.add(a.getName());
 		}
 		LinkedList<String> selectedTables = new LinkedList<String>();
-		selectedTables.add(t.getName());
+		selectedTables.add(car.getName());
 
 		Rows expected = new Rows(schema);
 		expected.add(malibu);
@@ -197,7 +202,7 @@ public class TableTest {
 		// Change something but leave the PK the same
 		malibuDupe.set(schema.get("color"), new CharValue("Orange"));
 		try {
-			t.insert(malibuDupe);
+			car.insert(malibuDupe);
 			fail("Did not catch exception on duplicate row.");
 		} catch (SchemaViolationException e) {
 			// Nothing; this is the expected result
@@ -257,6 +262,25 @@ public class TableTest {
         		joinCond); 
         
         assertEquals(expected, actual);
+	}
+	
+	@Test
+	public void serializeTest() throws IOException, ClassNotFoundException {
+		String filename = car.getName() + ".table";
+		
+		FileOutputStream fileOut = new FileOutputStream(filename);
+		ObjectOutputStream out = new ObjectOutputStream(fileOut);
+		System.out.println("Saving object in directory:" + System.getProperty("user.dir"));
+		out.writeObject(car);
+		out.close();
+		fileOut.close();
+		
+		FileInputStream fileIn = new FileInputStream(filename);
+		ObjectInputStream in = new ObjectInputStream(fileIn);
+		Table carDup = (Table) in.readObject();
+		assertEquals(car, carDup);
+		fileIn.close();
+		in.close();
 	}
 
 

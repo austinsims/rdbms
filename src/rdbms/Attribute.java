@@ -1,9 +1,10 @@
 package rdbms;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
 
-public class Attribute {
+public class Attribute implements Serializable {
 
 	public enum Type {
 		INT, 

@@ -1,6 +1,8 @@
 package rdbms;
 
-public class Constraint {
+import java.io.Serializable;
+
+public class Constraint implements Serializable {
 	Operator op;
 	Value referenceValue;
 	

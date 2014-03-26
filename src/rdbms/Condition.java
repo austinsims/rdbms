@@ -1,5 +1,7 @@
 package rdbms;
 
-public interface Condition {
+import java.io.Serializable;
+
+public interface Condition extends Serializable {
 	public boolean test(Row row) throws SchemaViolationException;
 }

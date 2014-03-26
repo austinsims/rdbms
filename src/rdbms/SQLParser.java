@@ -2,12 +2,10 @@ package rdbms;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
-import java.util.Set;
 
 // TODO: Verify all attribute names with verifyAttrNameOrDie
 
@@ -99,6 +97,15 @@ public class SQLParser {
 		return pad(string, character, character);
 	}
 
+	public static final int QUIT = 1;
+	public static final int CONTINUE = 0;
+	
+	/**
+	 * Parse the statement and then return a code indicating whether to continue execution
+	 * @param statement
+	 * @return SQLParser.QUIT to quit or SQLParser.CONTINUE to continue
+	 * @throws InvalidSQLException
+	 */
 	public static int parse(String statement) throws InvalidSQLException {
 		// Pad all commas and parens that aren't in single quotes with spaces so
 		// that they become individual tokens.
@@ -277,7 +284,6 @@ public class SQLParser {
 
 				}
 
-				// TODO: Error out if the PK is not specified
 				// Parse PRIMARY KEY ( attr1, attr2, ... )
 				// "PRIMARY KEY" already swallowed by attribute loop. still need
 				// to swallow the open paren
@@ -374,8 +380,11 @@ public class SQLParser {
 				if (!tokens.next().equals(";"))
 					throw new InvalidSQLException("Missing semicolon");
 
-				Table.tables.remove(Table.tables.get(tableToDrop));
-				System.out.println("Table dropped successfully");
+				if (Table.drop(Table.tables.get(tableToDrop))) {
+					System.out.println("Table dropped successfully");
+				} else {
+					System.err.println("Sorry, could not delete table file on disk.  Is it in use by another process?");
+				}
 				break;
 			case "SELECT":
 				// TODO: The values in the conditions can either be a constant
@@ -581,6 +590,7 @@ public class SQLParser {
 					helpTok = tokens.next();
 				} catch (NoSuchElementException e) {
 					System.out.print(HELP_HELP);
+					return CONTINUE;
 				}
 				switch (helpTok) {
 				case "TABLES":
@@ -623,11 +633,11 @@ public class SQLParser {
 					System.err.println(HELP_HELP);
 				}
 				break;
-			case "QUIT;":
+			case "QUIT":
 				// TODO: Make sure all changes are committed and all resources
 				// are closed
-				System.exit(0);
-				break;
+				System.out.println("Goodbye.");
+				return QUIT;
 			default:
 				System.err.println("Error, that is not a valid SQL command.");
 				break;
@@ -642,7 +652,7 @@ public class SQLParser {
 			tokens.close();
 		}
 
-		return 0;
+		return CONTINUE;
 
 	}
 

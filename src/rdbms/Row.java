@@ -1,10 +1,11 @@
 package rdbms;
+import java.io.Serializable;
 import java.util.Arrays;
 
 /**
  * A collection of values that fit a particular schema.  Add methods verify that the value fits in the proper place in the schema.
  */
-public class Row {
+public class Row implements Serializable {
 	Attributes schema;
 	Value[] values;
 	int colPos = 0;

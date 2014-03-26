@@ -1,12 +1,12 @@
 package rdbms;
+import static org.junit.Assert.assertEquals;
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.StringTokenizer;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 
 public class SQLSelectTest {
@@ -64,7 +64,7 @@ public class SQLSelectTest {
 		myOut.reset();
 		
 		SQLParser.parse("SELECT ename FROM employee;");
-		assertEquals("ename	\n"+"John", myOut.toString().trim());
+		compareLines(new String[] {"ename","John"}, myOut.toString());
 	}
 	
 	@Test
@@ -95,7 +95,7 @@ public class SQLSelectTest {
 		myOut.reset();
 
 		SQLParser.parse("SELECT * FROM employee;");
-		assertEquals("ename	eloc	\n"+"Jack	Chicago", myOut.toString().trim());
+		compareLines(new String[] {"ename	eloc", "Jack	Chicago"}, myOut.toString());
 		
 		myOut.reset();
 
@@ -105,12 +105,21 @@ public class SQLSelectTest {
 		myOut.reset();
 
 		SQLParser.parse("SELECT * FROM location;");
-		assertEquals("lname	lsales	\n"+"Chicago	5000000", myOut.toString().trim());
+		compareLines(new String[] {"lname	lsales", "Chicago	5000000"}, myOut.toString());
 
 		myOut.reset();
 		
 		SQLParser.parse("SELECT ename, lsales FROM employee, location WHERE eloc = lname;");
-        assertEquals("ename	lsales	\n"+"Jack	5000000", myOut.toString().trim());
+		compareLines(new String[] {"ename	lsales","Jack	5000000"}, myOut.toString());
 
+	}
+
+	private void compareLines(String[] expectedLines, String actual) {
+		// TODO Auto-generated method stub
+		String[] actualLines = 	actual.split("\n");
+		String[] actualTrimmedLines = new String[actualLines.length];
+		for (int i=0; i<actualLines.length; i++)
+			actualTrimmedLines[i] = actualLines[i].trim();
+		assertEquals(expectedLines, actualTrimmedLines);
 	}
 }

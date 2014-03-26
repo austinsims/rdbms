@@ -1,6 +1,8 @@
 package rdbms;
 
-public enum Operator {
+import java.io.Serializable;
+
+public enum Operator implements Serializable {
 	EQUAL("="), NOT_EQUAL("!="), LESS("<"), GREATER(">"), LESS_OR_EQUAL("<="), GREATER_OR_EQUAL(">=");
 
 	private String sqlRepresentation;

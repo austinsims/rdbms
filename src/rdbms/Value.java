@@ -1,6 +1,8 @@
 package rdbms;
 
-public abstract class Value {
+import java.io.Serializable;
+
+public abstract class Value implements Serializable {
 	
 	public abstract Attribute.Type getType();
 	
