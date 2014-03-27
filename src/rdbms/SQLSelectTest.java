@@ -20,7 +20,7 @@ public class SQLSelectTest {
 	}
 	
 	@Test
-	public void basic() throws InvalidAttributeException, SchemaViolationException, InvalidSQLException  {
+	public void basic() throws InvalidAttributeException, SchemaViolationException, InvalidSQLException, PermissionException  {
         String[] expected = new String[] {"thing", "hello"};
 
 
@@ -52,7 +52,7 @@ public class SQLSelectTest {
 	}
 	
 	@Test
-	public void simpleProject() throws InvalidSQLException {
+	public void simpleProject() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("CREATE TABLE employee ( ename char(50), eloc char(50), PRIMARY KEY (ename));");
 		assertEquals("Created table successfully", myOut.toString().trim().trim());
 		
@@ -68,7 +68,7 @@ public class SQLSelectTest {
 	}
 	
 	@Test
-	public void simpleJoin() throws InvalidSQLException {
+	public void simpleJoin() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("CREATE TABLE employee ( ename char(50), eloc char(50), PRIMARY KEY (ename));");
 		assertEquals("Created table successfully", myOut.toString().trim().trim());
 		

@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import rdbms.InvalidSQLException;
+import rdbms.PermissionException;
 import rdbms.SQLParser;
 
 public class User2 {
@@ -21,45 +22,45 @@ public class User2 {
 	}
 
 	@Test
-	public void help() throws InvalidSQLException {
+	public void help() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("HELP TABLES;");
 	}
 
 	@Test
-	public void helpDescribe() throws InvalidSQLException {
+	public void helpDescribe() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("HELP DESCRIBE STUDENT;");
 		SQLParser.parse("HELP DESCRIBE DEPARTMENT;");
 		SQLParser.parse("HELP DESCRIBE FACULTY;");
 	}
 
 	@Test
-	public void deleteFromGrade() throws InvalidSQLException {
+	public void deleteFromGrade() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("DELETE FROM GRADE;");
 	}
 
 	@Test
-	public void dropGrade() throws InvalidSQLException {
+	public void dropGrade() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("DROP TABLE GRADE;");
 	}
 
 	@Test
-	public void selectAllFromGrade() throws InvalidSQLException {
+	public void selectAllFromGrade() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("SELECT * FROM GRADE;");
 	}
 
 	@Test
-	public void selectFromStudent() throws InvalidSQLException {
+	public void selectFromStudent() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("SELECT * FROM STUDENT;");
 		SQLParser.parse("SELECT snum FROM STUDENT;");
 	}
 
 	@Test
-	public void selectFromDepartment() throws InvalidSQLException {
+	public void selectFromDepartment() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("SELECT deptid,dname FROM DEPARTMENT;");
 	}
 
 	@Test
-	public void quit() throws InvalidSQLException {
+	public void quit() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("QUIT;");
 	}
 

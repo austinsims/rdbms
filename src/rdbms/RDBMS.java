@@ -13,29 +13,54 @@ import java.io.Console;
  */
 public class RDBMS {
 	public static void main(String[] args) {
+		String username = null;
+		String filename = null;
+		// Check arguments.
+		if (args.length == 1) {
+			username = args[0];
+		} else if (args.length == 2) {
+			username = args[0];
+			filename = args[1];
+		} else {
+			System.err.println("Usage: java rdbms.RDBMS username [statements.sql]");
+		}
 		
-		// Load all tables from files.
+		
+		// Load all tables and users from files.
 		try {
-			Table.tables.load(new File(System.getProperty("user.dir")));
+			Database.tables.load(new File(System.getProperty("user.dir")));
+			File usersFile = new File("users.ser");
+			if (usersFile.exists())
+				Database.loadUsers(usersFile);
 		} catch (ClassNotFoundException e) {
 			System.err.println("Could not find Table class. Something has gone horribly wrong.");
 			System.exit(1);
+		} catch (IOException e) {
+			System.err.println("Could not load file users.ser: " + e.getMessage());
 		}
 		
-		// See if we have a filename as an argument
+		// Get user object from username arg
+		User loggedInUser = Database.getUser(username);
+		if (loggedInUser == null) {
+			System.err.println("User " + username + " not found. Exiting.");
+			System.exit(1);
+		}
+		Database.login(loggedInUser);
+
 		
 		Scanner in = null;
-		if (args.length > 0) {
+		if (filename != null) {
 			try {
-				in = new Scanner(new File(args[0]));
+				in = new Scanner(new File(filename));
 			} catch (FileNotFoundException e) {
-				System.err.println("Could not read from the file " + args[0]);
+				System.err.println("Could not read from the file " + filename);
 				System.exit(1);
 			}
 		} else {
 			in = new Scanner(System.in);
 			// Display welcome
 			System.out.println("Welcome to SimsSQL!  Input commands, or say HELP if you're clueless.");
+			System.out.println("You are currently logged in as " + loggedInUser.getName() +", and you are of type " + loggedInUser.getType());
 		}
 
 		while (in.hasNextLine()) {
@@ -54,13 +79,17 @@ public class RDBMS {
 					break;
 			} catch (InvalidSQLException e) {
 				System.err.println(e.getMessage());
+			} catch (PermissionException e) {
+				// TODO Auto-generated catch block
+				System.err.println("Permissions exception: " + e.getMessage());
 			}
 		}
 		in.close();
 		
 		// Save all tables to files.
 		try {
-			Table.tables.save(new File(System.getProperty("user.dir")));
+			Database.tables.saveTableFiles(new File(System.getProperty("user.dir")));
+			Database.saveUsers(new File("users.ser"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

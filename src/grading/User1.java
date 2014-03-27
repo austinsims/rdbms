@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import rdbms.InvalidSQLException;
+import rdbms.PermissionException;
 import rdbms.SQLParser;
 
 public class User1 {
@@ -21,7 +22,7 @@ public class User1 {
 	}
 
 	@Test
-	public void help() throws InvalidSQLException {
+	public void help() throws InvalidSQLException, PermissionException, PermissionException {
 
 		SQLParser.parse("HELP TABLES;");
 
@@ -42,18 +43,18 @@ public class User1 {
 	}
 
 	@Test
-	public void selectFromEnrolled() throws InvalidSQLException {
+	public void selectFromEnrolled() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("SELECT * FROM ENROLLED;");
 	}
 
 	@Test
-	public void tryToDropTables() throws InvalidSQLException {
+	public void tryToDropTables() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("DROP TABLE MANAGER;");
 		SQLParser.parse("DROP TABLE STUDENT;");
 	}
 
 	@Test
-	public void selectFromStudent() throws InvalidSQLException {
+	public void selectFromStudent() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("SELECT snum,sname FROM STUDENT;");
 		SQLParser.parse("SELECT * from ENROLLED WHERE student_num=14181;");
 		SQLParser
@@ -64,67 +65,67 @@ public class User1 {
 	}
 
 	@Test
-	public void insertIntoEnrolled() throws InvalidSQLException {
+	public void insertIntoEnrolled() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("INSERT INTO ENROLLED VALUES(1111,'CS448');");
 		SQLParser.parse("INSERT INTO ENROLLED VALUES(14181,'ENG400');");
 		SQLParser.parse("INSERT INTO ENROLLED VALUES(14181,'CS448');");
 	}
 
 	@Test
-	public void selectAllFromEnrolledWithConditions() throws InvalidSQLException {
+	public void selectAllFromEnrolledWithConditions() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("SELECT * FROM ENROLLED WHERE student_num=14181 OR class_name='CS448' OR student_num=1111;");
 	}
 
 	@Test
-	public void selectFromFacultyWithCondition() throws InvalidSQLException {
+	public void selectFromFacultyWithCondition() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("SELECT fname FROM FACULTY WHERE fid=1111;");
 	}
 
 	@Test
-	public void updateDepartment() throws InvalidSQLException {
+	public void updateDepartment() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("UPDATE DEPARTMENT SET location='WLafayette' WHERE deptid=11 OR deptid=22;");
 	}
 
 	@Test
-	public void updateStudent() throws InvalidSQLException {
+	public void updateStudent() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("UPDATE STUDENT SET age=21,sname='Smith' WHERE sname='A.Smith';");
 	}
 
 	@Test
-	public void selectAllFromClass() throws InvalidSQLException {
+	public void selectAllFromClass() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("SELECT * FROM CLASS;");
 	}
 
 	@Test
-	public void updateClass() throws InvalidSQLException {
+	public void updateClass() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("UPDATE CLASS SET meets_at='12:00';");
 	}
 
 	@Test
-	public void selectAllFromClassAgain() throws InvalidSQLException {
+	public void selectAllFromClassAgain() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("SELECT * FROM CLASS;");
 	}
 
 	@Test
-	public void createTable() throws InvalidSQLException {
+	public void createTable() throws InvalidSQLException, PermissionException {
 		SQLParser
 				.parse("CREATE TABLE GRADE(stu_num INT, classname CHAR(30), grade CHAR(2), PRIMARY KEY(stu_num, classname), FOREIGN KEY (stu_num) REFERENCES STUDENT(snum), FOREIGN KEY (classname) REFERENCES CLASS(cname));");
 	}
 
 	@Test
-	public void insertIntoTable() throws InvalidSQLException {
+	public void insertIntoTable() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("INSERT INTO GRADE VALUES('ENG400', 14181, 'A');");
 		SQLParser.parse("INSERT INTO GRADE VALUES(14181, 'ENG400', 'A');");
 		SQLParser.parse("INSERT INTO GRADE VALUES(80161,'ENG400', 'B');");
 	}
 
 	@Test
-	public void createUser() throws InvalidSQLException {
+	public void createUser() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("CREATE USER user10 User-A;");
 	}
 
 	@Test
-	public void quit() throws InvalidSQLException {
+	public void quit() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("QUIT;");
 	}
 

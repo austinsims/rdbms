@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import rdbms.InvalidSQLException;
+import rdbms.PermissionException;
 import rdbms.SQLParser;
 
 public class User5 {
@@ -21,34 +22,34 @@ public class User5 {
 	}
 
 	@Test
-	public void helpDescribeStudent() throws InvalidSQLException {
+	public void helpDescribeStudent() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("HELP DESCRIBE STUDENT;");
 	}
 
 	@Test
-	public void selectFromGrade() throws InvalidSQLException {
+	public void selectFromGrade() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("SELECT * FROM GRADE;");
 	}
 
 	@Test
-	public void selectFromStudent() throws InvalidSQLException {
+	public void selectFromStudent() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("SELECT * FROM STUDENT;");
 	}
 
 	@Test
-	public void selectFromFaculty() throws InvalidSQLException {
+	public void selectFromFaculty() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("SELECT * FROM FACULTY WHERE fid!=1010 AND fid!=1020;");
 		SQLParser.parse("SELECT * FROM FACULTY WHERE fid>=1050 OR fid<1020;");
 		SQLParser.parse("SELECT * FROM FACULTY WHERE fid<=1030 OR fid>1050;");
 	}
 
 	@Test
-	public void selectFromEnrolled() throws InvalidSQLException {
+	public void selectFromEnrolled() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("SELECT * FROM ENROLLED;");
 	}
 
 	@Test
-	public void quit() throws InvalidSQLException {
+	public void quit() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("QUIT;");
 	}
 

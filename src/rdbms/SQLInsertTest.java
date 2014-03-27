@@ -20,7 +20,7 @@ public class SQLInsertTest {
 
 	
 	@Test
-	public void basic() throws InvalidAttributeException, InvalidSQLException {
+	public void basic() throws InvalidAttributeException, InvalidSQLException, PermissionException {
 		String[] expected = new String[] {"Tuple", "inserted", "successfully", "Tuple", "inserted", "successfully"};
 		
 		Attributes schema = new Attributes();

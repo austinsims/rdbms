@@ -34,7 +34,7 @@ public class Tables extends HashSet<Table> {
 		throw new SchemaViolationException("The table named " + name + " does not exist");
 	}
 
-	public void save(File directory) throws IOException {
+	public void saveTableFiles(File directory) throws IOException {
 		for (Table t : this) {
 			String filename = t.getName() + ".table";
 			File file = new File(directory, filename);

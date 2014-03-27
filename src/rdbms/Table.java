@@ -12,19 +12,14 @@ import java.util.List;
 
 public class Table implements Serializable {
 	String name;
-	Attributes schema;
+	private Attributes schema;
+	private Attributes subschema;
 	Attributes pk;
 	List<ForeignKey> fks;
 	Rows rows;
 
-	static Tables tables;
-
-	static {
-		tables = new Tables();
-	}
-
 	static void insertIntoDB(Table t) {
-		tables.add(t);
+		Database.tables.add(t);
 	}
 
 	static void load() {
@@ -32,7 +27,7 @@ public class Table implements Serializable {
 	}
 
 	public static void dropEverything() {
-		tables.clear();
+		Database.tables.clear();
 	}
 
 	class ForeignKey implements Serializable {
@@ -70,39 +65,17 @@ public class Table implements Serializable {
 			SchemaViolationException {
 		
 		Attribute domesticAttribute = schema.get(domesticAttrName);
-		Table foreignTable = tables.get(foreignTableName);
+		Table foreignTable = Database.tables.get(foreignTableName);
 		Attribute foreignAttribute = foreignTable.schema.get(foreignAttrName);
 		
 		fks.add(new ForeignKey(domesticAttribute, foreignTable, foreignAttribute));
 
 	}
 
-	public String toString() {
-		StringBuilder s = new StringBuilder();
-
-		// List attributes
-		s.append(String.format("%s ( ", name));
-		for (Attribute a : schema) {
-			s.append(a.toString() + ", ");
-		}
-
-		// Show primary key
-		s.append("PRIMARY KEY (");
-		for (Attribute a : pk)
-			s.append(a.getName() + ", ");
-		s.append(")");
-
-		s.append(" )");
+	public boolean insert(Row newRow) throws SchemaViolationException, PermissionException {
+		if (Database.getLoggedInUser().getType().equals(User.Type.B))
+			throw new PermissionException("Sorry, users of type User-B may not insert tuples");
 		
-		// Show foreign key constraints
-		for (ForeignKey fk : this.fks ) {
-			s.append(String.format(" FOREIGN KEY %s REFERENCES %s (%s) ", fk.domesticAttribute.getName(), fk.foreignTable.getName(), fk.foreignAttribute.getName()));
-		}
-
-		return s.toString();
-	}
-
-	public boolean insert(Row newRow) throws SchemaViolationException {
 		// Get the new row's PK.
 		Value[] newRowPKValues = newRow.get(pk);
 		// If a row with that PK exists, throw exception
@@ -124,32 +97,19 @@ public class Table implements Serializable {
 		
 		return rows.add(newRow);
 	}
-
-	public static Rows select(List<String> selectedAttributes, List<String> selectedTables, Conditions conditions)
-			throws SchemaViolationException {
-		// if no Conditions specified, create a new one with no conditions
-		// (always passes)
-		if (conditions == null)
-			conditions = new Conditions();
-
-		Table first = Table.tables.get(selectedTables.get(0));
-		Rows crossProduct = first.rows;
-		for (int i = 1; i < selectedTables.size(); i++) {
-			Table next = Table.tables.get(selectedTables.get(1));
-			crossProduct = crossProduct.cross(next.rows);
+	
+	public void setSubschema(Attributes subschema) throws SchemaViolationException, PermissionException {
+		if (!Database.getLoggedInUser().getType().equals(User.Type.ADMIN))
+			throw new PermissionException("Sorry, you must be admin to set a subschema.");
+		
+		for (Attribute subattr : subschema) {
+			if (!schema.contains(subattr))
+				throw new SchemaViolationException("The attribute " + subattr + " specified in the subschema does not exist in the overall schema.");
 		}
-
-		Attributes subschema = new Attributes();
-		for (String attrName : selectedAttributes) {
-			subschema.add(crossProduct.schema.get(attrName));
-		}
-
-		Rows result = crossProduct.getAll(conditions).project(subschema);
-
-		return result;
+		this.subschema = subschema;
 	}
 
-	public boolean insertAll(Row... all) throws SchemaViolationException {
+	public boolean insertAll(Row... all) throws SchemaViolationException, PermissionException {
 		boolean success = true;
 		for (Row row : all) {
 			success = success && insert(row);
@@ -210,11 +170,44 @@ public class Table implements Serializable {
 	 * @param table
 	 */
 	public static boolean drop(Table table) {
-		// TODO: BUG: delete does not work. the table stays on disk
 		// TODO: search for tables that have foreign key references to this one; if any, do not delete and issue an error!
 		File tableFile = new File(table.getName() + ".table");
 		boolean success = tableFile.delete();
-		Table.tables.remove(table);
+		Database.tables.remove(table);
 		return success;
+	}
+
+	public String toString() {
+		StringBuilder s = new StringBuilder();
+	
+		// List attributes
+		s.append(String.format("%s ( ", name));
+		for (Attribute a : visibleSchema()) {
+			s.append(a.toString() + ", ");
+		}
+	
+		// Show primary key
+		s.append("PRIMARY KEY (");
+		for (Attribute a : pk)
+			s.append(a.getName() + ", ");
+		s.append(")");
+	
+		s.append(" )");
+		
+		// Show foreign key constraints
+		for (ForeignKey fk : this.fks ) {
+			s.append(String.format(" FOREIGN KEY %s REFERENCES %s (%s) ", fk.domesticAttribute.getName(), fk.foreignTable.getName(), fk.foreignAttribute.getName()));
+		}
+	
+		return s.toString();
+	}
+
+	// Get the subschema if there is one, or just return the schema if none is set
+	public Attributes visibleSchema() {
+		User loggedInUser = Database.getLoggedInUser();
+		if (subschema != null && loggedInUser.getType().equals(User.Type.B))
+			return subschema;
+		else
+			return schema;
 	}
 }

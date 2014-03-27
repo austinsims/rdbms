@@ -13,7 +13,7 @@ public class SQLDeleteFromTest {
 	}
 
 	@Test
-	public void testDeleteFrom() throws InvalidAttributeException, SchemaViolationException, InvalidSQLException {
+	public void testDeleteFrom() throws InvalidAttributeException, SchemaViolationException, InvalidSQLException, PermissionException {
 		Attributes schema = new Attributes();
 		schema.add(new Attribute("city", Attribute.Type.CHAR, 50));
 		schema.add(new Attribute("state", Attribute.Type.CHAR, 50));

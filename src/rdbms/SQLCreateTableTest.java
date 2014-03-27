@@ -24,7 +24,7 @@ public class SQLCreateTableTest {
 	}
 	
 	@Test
-	public void denseQuery() throws InvalidSQLException {
+	public void denseQuery() throws InvalidSQLException, PermissionException {
 		try {
 			SQLParser.parse("CREATE TABLE climate(ssn int,name char(50),age int,PRIMARY KEY(ssn));");
 		} catch (InvalidSQLException e) {
@@ -50,12 +50,12 @@ public class SQLCreateTableTest {
 	}
 	
 	@Test
-	public void domainConstraints() throws InvalidSQLException {
+	public void domainConstraints() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("CREATE TABLE employee ( ssn int, name char(50) CHECK(name != ''), age int CHECK(age > 0), PRIMARY KEY (ssn));");
 	}
 	
 	@Test
-	public void compoundDomainConstraints() throws InvalidSQLException {
+	public void compoundDomainConstraints() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("CREATE TABLE employee ( ssn int, name char(50) CHECK(name != ''), age int CHECK(age > 0 AND age < 150), PRIMARY KEY (ssn));");
 	}
 	

@@ -26,7 +26,7 @@ public class TableTest {
 
 	@Before
 	public void setUp() throws InvalidAttributeException,
-			SchemaViolationException {
+			SchemaViolationException, PermissionException {
 		Table.dropEverything();
 		
 		schema = new Attributes();
@@ -98,7 +98,7 @@ public class TableTest {
 		expected.add(malibu);
 		expected.add(explorer);
 
-		Rows actual = Table.select(selectedAttributes, selectedTables, null);
+		Rows actual = Database.select(selectedAttributes, selectedTables, null);
 
 		assertEquals(expected, actual);
 	}
@@ -152,7 +152,7 @@ public class TableTest {
 			selAttr.add(a.getName());
 		}
 		List<String> selTab = Arrays.asList(new String[] {"car"});
-		Rows actual = Table.select(
+		Rows actual = Database.select(
 				selAttr, 
 				selTab, 
 				conditions
@@ -180,7 +180,7 @@ public class TableTest {
 			selAttr.add(a.getName());
 		}
 		List<String> selTab = Arrays.asList(new String[] {"car"});
-		Rows actual = Table.select(
+		Rows actual = Database.select(
 				selAttr, 
 				selTab, 
 				conditions
@@ -194,10 +194,11 @@ public class TableTest {
 	/**
 	 * Make sure rows with duplicate PKs are not allowed
 	 * @throws SchemaViolationException 
+	 * @throws PermissionException 
 	 */
 
 	@Test
-	public void noDuplicatePKs() throws SchemaViolationException {
+	public void noDuplicatePKs() throws SchemaViolationException, PermissionException {
 		Row malibuDupe = new Row(malibu);
 		// Change something but leave the PK the same
 		malibuDupe.set(schema.get("color"), new CharValue("Orange"));
@@ -211,7 +212,7 @@ public class TableTest {
 	}
 	
 	@Test
-	public void testSimpleJoin() throws InvalidAttributeException, SchemaViolationException {
+	public void testSimpleJoin() throws InvalidAttributeException, SchemaViolationException, PermissionException {
 		Attributes employeeSchema = new Attributes();
 		Attribute ename = new Attribute("ename", Attribute.Type.CHAR, 50);
 		Attribute elocation = new Attribute("elocation", Attribute.Type.CHAR, 50);
@@ -256,7 +257,7 @@ public class TableTest {
         expected.add(new Row(joinSchema, new CharValue("Jack"), new DecValue(2)));
         expected.add(new Row(joinSchema, new CharValue("Ryan"), new DecValue(1)));
         
-        Rows actual = Table.select(
+        Rows actual = Database.select(
         		Arrays.asList(new String[] {"ename", "lsales"}),
         		Arrays.asList(new String[] {"employee", "location"}),
         		joinCond); 

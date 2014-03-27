@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import rdbms.InvalidSQLException;
+import rdbms.PermissionException;
 import rdbms.SQLParser;
 import rdbms.Table;
 
@@ -20,7 +21,7 @@ public class Admin1 {
 	}
 
 	@Test
-	public void createTables() throws InvalidSQLException {
+	public void createTables() throws InvalidSQLException, PermissionException {
 		// TODO: Log in as admin user
 		
 		SQLParser.parse("CREATE TABLE DEPARTMENT(deptid INT CHECK(deptid>0 AND deptid<100), dname CHAR(30), location CHAR(10), PRIMARY KEY(deptid));");
@@ -40,7 +41,7 @@ public class Admin1 {
 	}
 	
 	@Test
-	public void insertData() throws InvalidSQLException {
+	public void insertData() throws InvalidSQLException, PermissionException {
 		// TODO: Log in as admin user
 		
 	    SQLParser.parse("INSERT INTO DEPARTMENT VALUES (101, 'Computer Sciences','West Lafayette');");
