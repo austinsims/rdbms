@@ -19,7 +19,7 @@ public class SQLDeleteFromTest {
 		schema.add(new Attribute("state", Attribute.Type.CHAR, 50));
 		
 		Table cities = new Table("city", schema, schema);
-		Table.insertIntoDB(cities);
+		Database.insertIntoDB(cities);
 		
 		cities.insert(new Row(schema,
 				new CharValue("Bloomington"),

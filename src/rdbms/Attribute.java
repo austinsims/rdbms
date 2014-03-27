@@ -46,12 +46,18 @@ public class Attribute implements Serializable {
 	}
 	
 	public String toString() {
-		if (type.equals(Type.CHAR))
-			return String.format("%s char(%d)", name, charLen);
-		else if (type.equals(Type.INT))
-			return String.format("%s int", name);
-		else
-			return String.format("%s decimal", name);
+		StringBuilder sb = new StringBuilder();
+		sb.append(name + " " + type.toString());
+		if (constraints.size() > 0) {
+			sb.append(" CHECK(");
+			for (Constraint c : constraints) {
+				sb.append(c);
+				sb.append(" " + constraints.getOperator().toString() + " ");
+				sb.append(")");
+			}
+		}
+		
+		return sb.toString();
 	}
 	
 	public String getName() {

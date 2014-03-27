@@ -21,7 +21,7 @@ public class SQLUpdateTest {
 		pk.add(schema.get(0));
 		
 		Table table = new Table("people", schema, pk);
-		Table.insertIntoDB(table);
+		Database.insertIntoDB(table);
 		
 		Row austin = new Row(schema, new CharValue("Austin"), new CharValue("West Lafayette"));
 		Row holly = new Row(schema, new CharValue("Holly"), new CharValue("Ann Arbor"));

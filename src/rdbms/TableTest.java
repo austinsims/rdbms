@@ -41,7 +41,7 @@ public class TableTest {
 		pk.add(schema.get(1));
 
 		car = new Table("car", schema, pk);
-		Table.insertIntoDB(car);
+		Database.insertIntoDB(car);
 
 		malibu = new Row(schema);
 		malibu.set(new Value[] { new CharValue("Chevrolet"),
@@ -221,7 +221,7 @@ public class TableTest {
 		Attributes empPk = new Attributes();
 		empPk.add(employeeSchema.get(0));
 		Table employee = new Table("employee", employeeSchema, empPk);
-		Table.insertIntoDB(employee);
+		Database.insertIntoDB(employee);
 		employee.insert(new Row(employeeSchema, new CharValue("Jeff"), new CharValue("Chicago")));
         employee.insert(new Row(employeeSchema, new CharValue("Sally"), new CharValue("New York")));
         employee.insert(new Row(employeeSchema, new CharValue("Jim"), new CharValue("LA")));
@@ -237,7 +237,7 @@ public class TableTest {
 		Attributes locPk = new Attributes();
 		locPk.add(locationSchema.get(0));
 		Table location = new Table("location", locationSchema, locPk);
-		Table.insertIntoDB(location);
+		Database.insertIntoDB(location);
 		location.insert(new Row(locationSchema, new CharValue("Chicago"), new DecValue(3)));
         location.insert(new Row(locationSchema, new CharValue("New York"), new DecValue(1)));
         location.insert(new Row(locationSchema, new CharValue("LA"), new DecValue(2)));

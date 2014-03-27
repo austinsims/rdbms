@@ -71,7 +71,7 @@ public class SQLParser {
 	public static int parse(String statement) throws InvalidSQLException, PermissionException {
 		// Get logged in user from Database
 		User loggedInUser = Database.getLoggedInUser();
-		
+
 		// Pad all commas and parens that aren't in single quotes with spaces so
 		// that they become individual tokens.
 		statement = pad(statement, ",");
@@ -79,21 +79,22 @@ public class SQLParser {
 		statement = pad(statement, "\\(");
 		statement = pad(statement, "\\)");
 
-		// Pad all relational operators
-		statement = pad(statement, "[^!]=", "=");
-		statement = pad(statement, "!=");
+		// Pad all relational operator pieces (they will be parsed separately)
+		statement = pad(statement, "=");
 		statement = pad(statement, ">");
 		statement = pad(statement, "<");
-		statement = pad(statement, ">=");
-		statement = pad(statement, "<=");
+		statement = pad(statement, "!");
+
+		/*
+		 * statement = pad(statement, "!="); statement = pad(statement, ">=");
+		 * statement = pad(statement, "<=");
+		 */
 
 		// Pad all arithmetic operators
 		/*
-		statement = pad(statement, "\\*");
-		statement = pad(statement, "/");
-		statement = pad(statement, "\\+");
-		statement = pad(statement, "-");
-		*/
+		 * statement = pad(statement, "\\*"); statement = pad(statement, "/");
+		 * statement = pad(statement, "\\+"); statement = pad(statement, "-");
+		 */
 
 		Scanner tokens = new Scanner(statement);
 		String command = tokens.next();
@@ -200,8 +201,7 @@ public class SQLParser {
 								if (!asdf.equals(attrName))
 									throw new InvalidSQLException("Constraints must be specified on own attribute only");
 								// Get the operator
-								String constOp = tokens.next();
-								Operator op = Operator.fromString(constOp);
+								Operator op = parseToOperator(tokens);
 								if (op == null)
 									throw new InvalidSQLException("Operator must be one of " + Operator.values());
 								Value val = parseToValue(tokens, newAttr);
@@ -287,7 +287,7 @@ public class SQLParser {
 
 					// Create Table object
 					Table newTable = new Table(tableName, attributes, pk);
-					Table.insertIntoDB(newTable);
+					Database.insertIntoDB(newTable);
 
 					// Optionally Parse ', FOREIGN KEY' ( fk ) REFERENCES table
 					// (
@@ -351,13 +351,14 @@ public class SQLParser {
 
 					// Create user
 					String username = tokens.next();
-					
-					// Here comes some nasty hackish code to circumvent "User-A" containing SQL arithmetic operator
+
+					// Here comes some nasty hackish code to circumvent "User-A"
+					// containing SQL arithmetic operator
 					User.Type usertype = User.Type.fromString(tokens.next());
 					if (usertype == null) {
 						throw new InvalidSQLException("User type must be either User-A or User-B");
 					}
-					
+
 					if (!tokens.next().equals(";"))
 						throw new InvalidSQLException("Missing semicolon");
 
@@ -369,18 +370,18 @@ public class SQLParser {
 					if (!loggedInUser.getType().equals(User.Type.ADMIN)) {
 						throw new PermissionException("Sorry, you must be an admin to create a subschema.");
 					}
-					
+
 					String tableName = tokens.next();
 					Table table = Database.tables.get(tableName);
 					Attributes schema = table.getAttributes();
-					
+
 					Attributes subschema = new Attributes();
 					boolean hasNextAttr = true;
 					while (hasNextAttr) {
 						String subattrName = tokens.next();
 						Attribute subattr = schema.get(subattrName);
 						subschema.add(subattr);
-						
+
 						if (tokens.hasNext(","))
 							hasNextAttr = true;
 						else if (tokens.hasNext(";"))
@@ -494,7 +495,7 @@ public class SQLParser {
 				} // if (whereClause)
 
 				Rows result = Database.select(selectedAttributeNames, selectedTableNames, cond);
-				
+
 				// Print table header
 				System.out.println(result.schema.tableHeader());
 				// Print rows
@@ -770,8 +771,8 @@ public class SQLParser {
 		while (hasNextCondition) {
 			// TODO: Input validation??
 			String lhsStr = tokens.next();
-			String opStr = tokens.next();
-			Operator op = Operator.fromString(opStr);
+
+			Operator op = parseToOperator(tokens);
 
 			Attribute lhs = findAttrInTables(selectedTables, lhsStr);
 
@@ -815,6 +816,26 @@ public class SQLParser {
 			}
 		}
 		return cond;
+	}
+
+	public static Operator parseToOperator(Scanner tokens) {
+		// Parse operator pieces
+		StringBuilder opStr = new StringBuilder();
+		String piece = tokens.next();
+		switch (piece) {
+		case "=":
+			opStr.append(piece);
+			break;
+		case "!":
+		case "<":
+		case ">":
+			opStr.append(piece);
+			if (tokens.hasNext("="))
+				opStr.append(tokens.next());
+			break;
+		}
+		Operator op = Operator.fromString(opStr.toString());
+		return op;
 	}
 
 	private static Attribute findAttrInTables(List<String> selectedTables, String attrName) throws InvalidSQLException, SchemaViolationException {

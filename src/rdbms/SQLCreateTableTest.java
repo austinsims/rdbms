@@ -52,6 +52,7 @@ public class SQLCreateTableTest {
 	@Test
 	public void domainConstraints() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("CREATE TABLE employee ( ssn int, name char(50) CHECK(name != ''), age int CHECK(age > 0), PRIMARY KEY (ssn));");
+		SQLParser.parse("CREATE TABLE stuff ( a INT CHECK(a>0), b INT CHECK(b<0), c INT CHECK(c!=0), d INT CHECK(d<=0), e INT CHECK(e>=0), f INT CHECK(f=0), PRIMARY KEY (a));"); 
 	}
 	
 	@Test

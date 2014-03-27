@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,14 +19,6 @@ public class Table implements Serializable {
 	List<ForeignKey> fks;
 	Rows rows;
 
-	static void insertIntoDB(Table t) {
-		Database.tables.add(t);
-	}
-
-	static void load() {
-
-	}
-
 	public static void dropEverything() {
 		Database.tables.clear();
 	}
@@ -35,9 +28,12 @@ public class Table implements Serializable {
 		Table foreignTable;
 		Attribute foreignAttribute;
 
-		ForeignKey(Attribute domesticAttribute, Table foreignTable, Attribute foreignAttribute) {
+		ForeignKey(Attribute domesticAttribute, Table foreignTable, Attribute foreignAttribute) throws SchemaViolationException {
 			this.domesticAttribute = domesticAttribute;
 			this.foreignTable = foreignTable;
+			Attributes foreignPk = foreignTable.pk;
+			if (foreignPk.size() != 1 || !foreignAttribute.equals(foreignPk.get(0)))
+				throw new SchemaViolationException("Foreign keys may only be specified on a single-attribute primary key.");
 			this.foreignAttribute = foreignAttribute;
 		}
 	}
@@ -89,10 +85,16 @@ public class Table implements Serializable {
 			throw new SchemaViolationException("This table already has a row with the PK = " + newRowPKValues);
 
 		// Check foreign key constraints.
-		// TODO: Question: Since there is no UNIQUE in our Mini-SQL, should we check to make sure that
-		//       the value of the foreign key attribute references only one tuple in the foreign table?
 		for (ForeignKey fk : fks) {
-			
+			Conditions fkCond = new Conditions();
+			Value domesticValue = newRow.get(fk.domesticAttribute);
+			fkCond.add(fk.foreignAttribute, Operator.EQUAL, domesticValue);
+			List<String> selectedAttributes = Arrays.asList(new String[] {fk.foreignAttribute.getName()});
+			List<String> selectedTables = Arrays.asList(new String[] {fk.foreignTable.getName()});
+			Rows results = Database.select(selectedAttributes, selectedTables, fkCond);
+			if (results.size() != 1) {
+				throw new SchemaViolationException("Could not find strictly one tuple in " + fk.foreignTable + " that has a value " + domesticValue + " for " + fk.foreignAttribute);
+			}
 		}
 		
 		return rows.add(newRow);

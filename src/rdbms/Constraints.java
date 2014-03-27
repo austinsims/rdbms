@@ -12,7 +12,7 @@ public class Constraints extends ArrayList<Constraint> {
 		AND, OR,
 	}
 
-	Operator operator;
+	Operator operator = Operator.AND; // default to and
 
 	public void setOperator(Operator op) {
 		this.operator = op;
@@ -41,5 +41,9 @@ public class Constraints extends ArrayList<Constraint> {
 		}
 		}
 		return false;
+	}
+
+	public Operator getOperator() {
+		return operator;
 	}
 }

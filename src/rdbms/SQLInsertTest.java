@@ -36,7 +36,7 @@ public class SQLInsertTest {
 
 		Table t = new Table("car", schema, pk);
 		
-		Table.insertIntoDB(t);
+		Database.insertIntoDB(t);
 
 		SQLParser.parse("INSERT INTO car VALUES ( 'Rolls Royce', 'z350x', 999, 'Black', 100000 );");
 		SQLParser.parse("INSERT INTO car VALUES ( 'Dodge', 'Charger', 350, 'Red', 35000 );");

@@ -30,7 +30,7 @@ public class SQLSelectTest {
         	Attributes pk = new Attributes();
         	pk.add(schema.get(0));
         	Table stuff = new Table("stuff", schema, pk);
-        	Table.insertIntoDB(stuff);
+        	Database.insertIntoDB(stuff);
 
         	// Insert a row into it
         	Row row = new Row(schema);

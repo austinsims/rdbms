@@ -28,6 +28,8 @@ public class SQLDropTableTest {
 			SQLParser.parse("DROP TABLE stuff;");
 			assertEquals("Table dropped successfully", myOut.toString().trim());
 			
+			myOut.reset();
+			
 			SQLParser.parse("CREATE TABLE stuff ( thing int , PRIMARY KEY ( thing ) );");
 			assertEquals("Created table successfully", myOut.toString().trim());
 			
