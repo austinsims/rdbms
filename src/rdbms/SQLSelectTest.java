@@ -1,5 +1,6 @@
 package rdbms;
 import static org.junit.Assert.assertEquals;
+import static rdbms.Assert.assertLinesEqual;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -16,7 +17,7 @@ public class SQLSelectTest {
 	public void setUp() {
 		myOut = new ByteArrayOutputStream();
 		System.setOut(new PrintStream(myOut));
-		Table.dropEverything();
+		Database.clear();
 	}
 	
 	@Test
@@ -64,7 +65,7 @@ public class SQLSelectTest {
 		myOut.reset();
 		
 		SQLParser.parse("SELECT ename FROM employee;");
-		compareLines(new String[] {"ename","John"}, myOut.toString());
+		assertLinesEqual("ename\nJohn", myOut.toString());
 	}
 	
 	@Test
@@ -80,12 +81,12 @@ public class SQLSelectTest {
         myOut.reset();
 
 		SQLParser.parse("HELP DESCRIBE employee;");
-		assertEquals("employee ( ename char(50), eloc char(50), PRIMARY KEY (ename, ) )", myOut.toString().trim());
+		assertEquals("employee ( ename CHAR(50), eloc CHAR(50), PRIMARY KEY (ename, ) )", myOut.toString().trim());
 		
 		myOut.reset();
 
 		SQLParser.parse("HELP DESCRIBE location;");
-		assertEquals("location ( lname char(50), lsales int, PRIMARY KEY (lname, ) )", myOut.toString().trim());
+		assertEquals("location ( lname CHAR(50), lsales INT, PRIMARY KEY (lname, ) )", myOut.toString().trim());
 		
 		myOut.reset();
 
@@ -95,7 +96,7 @@ public class SQLSelectTest {
 		myOut.reset();
 
 		SQLParser.parse("SELECT * FROM employee;");
-		compareLines(new String[] {"ename	eloc", "Jack	Chicago"}, myOut.toString());
+		assertLinesEqual("ename	eloc\nJack	Chicago", myOut.toString());
 		
 		myOut.reset();
 
@@ -105,21 +106,14 @@ public class SQLSelectTest {
 		myOut.reset();
 
 		SQLParser.parse("SELECT * FROM location;");
-		compareLines(new String[] {"lname	lsales", "Chicago	5000000"}, myOut.toString());
+		assertLinesEqual("lname	lsales\nChicago	5000000", myOut.toString());
 
 		myOut.reset();
 		
 		SQLParser.parse("SELECT ename, lsales FROM employee, location WHERE eloc = lname;");
-		compareLines(new String[] {"ename	lsales","Jack	5000000"}, myOut.toString());
+		assertLinesEqual("ename	lsales\nJack	5000000", myOut.toString());
 
 	}
 
-	private void compareLines(String[] expectedLines, String actual) {
-		// TODO Auto-generated method stub
-		String[] actualLines = 	actual.split("\n");
-		String[] actualTrimmedLines = new String[actualLines.length];
-		for (int i=0; i<actualLines.length; i++)
-			actualTrimmedLines[i] = actualLines[i].trim();
-		assertEquals(expectedLines, actualTrimmedLines);
-	}
+	
 }

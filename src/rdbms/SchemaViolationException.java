@@ -1,6 +1,6 @@
 package rdbms;
 
-public class SchemaViolationException extends Exception {
+public class SchemaViolationException extends RDBMSException {
 	/**
 	 * 
 	 */

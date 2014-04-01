@@ -7,7 +7,7 @@ public class SQLCreateTableTest {
 	
 	@Before
 	public void setUp() {
-		Table.dropEverything();
+		Database.clear();
 	}
 	
 	/**

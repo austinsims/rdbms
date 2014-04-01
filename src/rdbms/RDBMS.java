@@ -24,21 +24,9 @@ public class RDBMS {
 		} else {
 			System.err.println("Usage: java rdbms.RDBMS username [statements.sql]");
 		}
-		
-		
-		// Load all tables and users from files.
-		try {
-			Database.tables.load(new File(System.getProperty("user.dir")));
-			File usersFile = new File("users.ser");
-			if (usersFile.exists())
-				Database.loadUsers(usersFile);
-		} catch (ClassNotFoundException e) {
-			System.err.println("Could not find Table class. Something has gone horribly wrong.");
-			System.exit(1);
-		} catch (IOException e) {
-			System.err.println("Could not load file users.ser: " + e.getMessage());
-		}
-		
+
+		load();
+
 		// Get user object from username arg
 		User loggedInUser = Database.getUser(username);
 		if (loggedInUser == null) {
@@ -47,7 +35,6 @@ public class RDBMS {
 		}
 		Database.login(loggedInUser);
 
-		
 		Scanner in = null;
 		if (filename != null) {
 			try {
@@ -60,15 +47,15 @@ public class RDBMS {
 			in = new Scanner(System.in);
 			// Display welcome
 			System.out.println("Welcome to SimsSQL!  Input commands, or say HELP if you're clueless.");
-			System.out.println("You are currently logged in as " + loggedInUser.getName() +", and you are of type " + loggedInUser.getType());
+			System.out.println("You are currently logged in as " + loggedInUser.getName() + ", and you are of type " + loggedInUser.getType());
 		}
 
 		while (in.hasNextLine()) {
-			
+
 			String command;
 			int returnCode;
 			try {
-				
+
 				command = in.nextLine();
 			} catch (NoSuchElementException e) {
 				continue;
@@ -85,7 +72,11 @@ public class RDBMS {
 			}
 		}
 		in.close();
-		
+
+		save();
+	}
+
+	public static void save() {
 		// Save all tables to files.
 		try {
 			Database.tables.saveTableFiles(new File(System.getProperty("user.dir")));
@@ -93,6 +84,21 @@ public class RDBMS {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+
+	public static void load() {
+		// Load all tables and users from files.
+		try {
+			Database.tables.load(new File(System.getProperty("user.dir")));
+			File usersFile = new File("users.ser");
+			if (usersFile.exists())
+				Database.loadUsers(usersFile);
+		} catch (ClassNotFoundException e) {
+			System.err.println("Could not find Table class. Something has gone horribly wrong.");
+			System.exit(1);
+		} catch (IOException e) {
+			System.err.println("Could not load file users.ser: " + e.getMessage());
 		}
 	}
 }

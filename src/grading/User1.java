@@ -9,6 +9,7 @@ import org.junit.Test;
 import rdbms.InvalidSQLException;
 import rdbms.PermissionException;
 import rdbms.SQLParser;
+import static rdbms.Assert.assertLinesEqual;
 
 public class User1 {
 	ByteArrayOutputStream myOut;
@@ -25,16 +26,19 @@ public class User1 {
 	public void help() throws InvalidSQLException, PermissionException, PermissionException {
 
 		SQLParser.parse("HELP TABLES;");
-
+		assertLinesEqual("DEPARTMENT\nFACULTY\nSTUDENT\nCLASS\nENROLLED", myOut.toString());
+		myOut.reset();
+				
 		SQLParser.parse("HELP DESCRIBE STUDENT;");
 
+		// Don't bother with comparing result for help on commands
 		SQLParser.parse("HELP CREATE TABLE;");
 
 		SQLParser.parse("HELP DROP TABLE;");
 
 		SQLParser.parse("HELP SELECT;");
 
-		SQLParser.parse("HELP INSERT:");
+		SQLParser.parse("HELP INSERT;");
 
 		SQLParser.parse("HELP DELETE;");
 

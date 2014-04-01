@@ -1,6 +1,6 @@
 package rdbms;
 
-public class IntegrityException extends Exception {
+public class IntegrityException extends RDBMSException {
 	/**
 	 * 
 	 */

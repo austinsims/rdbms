@@ -63,7 +63,7 @@ public class Admin2 {
 
 	@Test
 	public void deleteFromEnrolled() throws InvalidSQLException, PermissionException {
-		SQLParser.parse("DELETE FROM ENROLLED WHERE snum=16711 OR snum=11;");
+		SQLParser.parse("DELETE FROM ENROLLED WHERE student_num=16711 OR student_num=11;");
 	}
 
 	@Test

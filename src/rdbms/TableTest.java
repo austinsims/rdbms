@@ -27,7 +27,7 @@ public class TableTest {
 	@Before
 	public void setUp() throws InvalidAttributeException,
 			SchemaViolationException, PermissionException {
-		Table.dropEverything();
+		Database.clear();
 		
 		schema = new Attributes();
 		schema.add(new Attribute("make", Attribute.Type.CHAR, 50));

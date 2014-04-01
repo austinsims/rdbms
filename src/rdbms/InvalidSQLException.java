@@ -1,6 +1,6 @@
 package rdbms;
 
-public class InvalidSQLException extends Exception {
+public class InvalidSQLException extends RDBMSException {
 	/**
 	 * 
 	 */

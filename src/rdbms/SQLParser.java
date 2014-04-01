@@ -11,6 +11,8 @@ import java.util.Scanner;
 
 // Phase 0.1.  All (yes, all) tokens must be separated by spaces, including commas and parens.
 public class SQLParser {
+	
+
 
 	private final static String HELP_CREATE = "This command has the form:\n" + "\n" + "CREATE TABLE table_name ( attribute_1 attribute1_type CHECK (constraint1),\n" + "attribute_2 attribute2_type, �, PRIMARY KEY ( attribute_1, attribute_2 ), FOREIGN\n" + "KEY ( attribute_y ) REFERENCES table_x ( attribute_t ), FOREIGN KEY\n" + "( attribute_w ) REFERENCES table_y ( attribute_z )... );\n" + "\n" + "The �CREATE TABLE� token is followed by any number of attribute\n" + "name � attribute type pairs separated by commas. Each attribute\n" + "name � attribute type pair can optionally be followed by a\n" + "constraint specified using the keyword �CHECK� followed by a\n" + "domain constraint in one of the forms specified in Table 3,\n" + "enclosed in parentheses. This is followed by the token �PRIMARY\n" + "KEY� and a list of attribute names separated by commas, enclosed\n" + "in parentheses. Note that the specification of the primary key\n" + "constraint is mandatory in this project and will always follow\n" + "the listing of attributes. After the primary key constraint, the\n" + "command should accept an optional list of foreign key constraints\n" + "specified with the token �FOREIGN KEY� followed by an attribute\n" + "name enclosed in parentheses, followed by the keyword\n" + "�REFERENCES�, a table name and an attribute name enclosed in\n" + "parentheses.  Multiple foreign key constraints are separated by\n" + "commas.\n";
 
@@ -98,7 +100,6 @@ public class SQLParser {
 
 		Scanner tokens = new Scanner(statement);
 		String command = tokens.next();
-		boolean expectComma = true;
 
 		try {
 			switch (command) {
@@ -116,7 +117,7 @@ public class SQLParser {
 
 					// Make sure a table by that name does not already exist
 					if (Database.tables.contains(tableName))
-						throw new InvalidSQLException("A table named " + tableName + " already exists.");
+						throw new InvalidSQLException("Error: Duplicate table!");
 
 					// Begin parsing attributes of form: name type [CHECK (
 					// constraint )]
@@ -124,20 +125,17 @@ public class SQLParser {
 					boolean hasNextAttribute = true;
 					while (hasNextAttribute) {
 
+						if (tokens.hasNext("PRIMARY"))
+							break;
+
+						if (tokens.hasNext("FOREIGN"))
+							break;
+
 						// Only needed if there is a char type attribute in the
 						// statement
 						Integer charLen = null;
 
 						String attrName = tokens.next();
-						if (attrName.equals("PRIMARY")) {
-							// Whoops, we're past the attribute list. Now we're
-							// at
-							// FOREIGN KEY ...
-							if (!tokens.next().equals("KEY"))
-								throw new InvalidSQLException("PRIMARY must be followed by KEY");
-							hasNextAttribute = false;
-							break; // exit attribute list
-						}
 
 						String attrTypeStr = tokens.next();
 						Attribute.Type attrType;
@@ -182,7 +180,6 @@ public class SQLParser {
 							hasNextAttribute = true;
 							break;
 						case ")":
-						case ");":
 							hasNextAttribute = false;
 							break;
 						case "CHECK":
@@ -253,6 +250,12 @@ public class SQLParser {
 
 					}
 
+					if (!tokens.next().equals("PRIMARY"))
+						throw new InvalidSQLException(("Invalid CREATE TABLE statement"));
+
+					if (!tokens.next().equals("KEY"))
+						throw new InvalidSQLException(("Invalid CREATE TABLE statement"));
+
 					// Parse PRIMARY KEY ( attr1, attr2, ... )
 					// "PRIMARY KEY" already swallowed by attribute loop. still
 					// need
@@ -273,11 +276,6 @@ public class SQLParser {
 							break;
 						case ")":
 							hasNextPkAttr = false;
-							expectComma = true;
-							break;
-						case "),":
-							hasNextPkAttr = false;
-							expectComma = false;
 							break;
 						default:
 							throw new InvalidSQLException("Attributes within a PRIMARY KEY attribute list must be separated by commas");
@@ -287,26 +285,24 @@ public class SQLParser {
 
 					// Create Table object
 					Table newTable = new Table(tableName, attributes, pk);
-					Database.insertIntoDB(newTable);
 
-					// Optionally Parse ', FOREIGN KEY' ( fk ) REFERENCES table
-					// (
-					// attr ), ...
-					String expectedNextToken = expectComma ? "," : "FOREIGN";
-					if (tokens.hasNext(expectedNextToken)) {
-						// Swallow FOREIGN KEY and the comma if it is expected
-						if (expectComma)
-							tokens.next(); // swallow comma
+					// Optionally Parse ', FOREIGN KEY' ( fk ) REFERENCES table,
+					// ...
 
-						if (!tokens.next().equals("FOREIGN"))
-							throw new InvalidSQLException("FOREIGN must be followed by KEY");
-						if (!tokens.next().equals("KEY"))
-							throw new InvalidSQLException("FOREIGN must be followed by KEY");
-						if (!tokens.next().equals("("))
-							throw new InvalidSQLException("FOREIGN must be followed by KEY");
+					if (tokens.hasNext(",")) {
+						
+						String d= tokens.next();
 
 						boolean hasNextFK = true;
 						while (hasNextFK) {
+							String c = tokens.next();
+							if (!c.equals("FOREIGN"))
+								throw new InvalidSQLException("FOREIGN must be followed by KEY");
+							if (!tokens.next().equals("KEY"))
+								throw new InvalidSQLException("FOREIGN must be followed by KEY");
+							if (!tokens.next().equals("("))
+								throw new InvalidSQLException("FOREIGN must be followed by KEY");
+							
 							String fkAttrName = tokens.next();
 							if (!tokens.next().equals(")"))
 								throw new InvalidSQLException("FOREIGN KEY must specify one attribute followed by a ')'");
@@ -323,26 +319,32 @@ public class SQLParser {
 								throw new InvalidSQLException("Got an integrity violation: " + e.getMessage());
 							}
 
-							String tok = tokens.next();
-							switch (tok) {
-							case "),":
+							if (!tokens.next().equals(")"))
+								throw new InvalidSQLException("Invalid FOREIGN KEY expression");
+
+							
+							if (tokens.hasNext(",")) {
+								tokens.next();
 								hasNextFK = true;
-								break;
-							case ")":
+							} else {
 								hasNextFK = false;
-								break;
 							}
 
 						}
-
 					}
 
-					if (!tokens.next().equals(")"))
-						throw new InvalidSQLException("Must close CREATE TABLE with ');'");
-					if (!tokens.next().equals(";"))
+					String a = tokens.next();
+					// if (!tokens.next().equals(")"))
+					if (!a.equals(")"))
 						throw new InvalidSQLException("Must close CREATE TABLE with ');'");
 
-					System.out.println("Created table successfully");
+					String b = tokens.next();
+					// if (!tokens.next().equals(";"))
+					if (!b.equals(";"))
+						throw new InvalidSQLException("Must close CREATE TABLE with ');'");
+
+					Database.insertIntoDB(newTable);
+					System.out.println("Table created successfully");
 					break;
 				} else if (whatToCreate.equals("USER")) {
 					// Check user permissions
@@ -616,7 +618,7 @@ public class SQLParser {
 				}
 
 				// Parse WHERE clause (condition list)
-
+				// TODO: enforce foreign key constraints
 				Conditions updateConditions = parseConditionList(tokens, updateTables);
 				Rows rowsToUpdate = tableToUpdate.rows.getAll(updateConditions);
 				for (Row row : rowsToUpdate) {
@@ -625,7 +627,6 @@ public class SQLParser {
 					}
 				}
 
-				// TODO: print number of rows affected
 				System.out.printf("%d rows affected", rowsToUpdate.size());
 
 				break;
@@ -695,10 +696,8 @@ public class SQLParser {
 				System.err.println("Error, that is not a valid SQL command.");
 				break;
 			} // switch
-		} catch (InvalidSQLException e) {
+		} catch (RDBMSException e) {
 			System.err.println(e.getMessage());
-		} catch (SchemaViolationException e) {
-			System.err.println("Schema violation: " + e.getMessage());
 		} catch (NoSuchElementException e) {
 			System.err.println("Input ended unexpectedly.  Did you forget to close parens or a semicolon?");
 		} finally {

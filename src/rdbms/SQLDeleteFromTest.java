@@ -9,7 +9,7 @@ public class SQLDeleteFromTest {
 
 	@Before
 	public void setUp() throws Exception {
-		Table.dropEverything();
+		Database.clear();
 	}
 
 	@Test

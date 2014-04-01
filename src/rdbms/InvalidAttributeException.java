@@ -1,6 +1,6 @@
 package rdbms;
 
-public class InvalidAttributeException extends Exception {
+public class InvalidAttributeException extends RDBMSException {
 	/**
 	 * 
 	 */

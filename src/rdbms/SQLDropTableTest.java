@@ -15,7 +15,7 @@ public class SQLDropTableTest {
 	public void setUp() {
 		myOut = new ByteArrayOutputStream();
 		System.setOut(new PrintStream(myOut));
-		Table.dropEverything();
+		Database.clear();
 	}
 	
 	@Test

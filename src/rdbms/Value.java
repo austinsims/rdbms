@@ -5,6 +5,7 @@ import java.io.Serializable;
 public abstract class Value implements Serializable {
 	
 	public abstract Attribute.Type getType();
+	public abstract String toString();
 	
 	/**
 	 * Superclass method that does type checking; subclasses must do value checking by overriding and calling this through super.equals(...) at some point. 

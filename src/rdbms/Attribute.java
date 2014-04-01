@@ -14,7 +14,7 @@ public class Attribute implements Serializable {
 	
 	String name;
 	Type type;
-	int charLen;
+	public int charLen;
 	Constraints constraints;
 	
 	/**
@@ -48,6 +48,9 @@ public class Attribute implements Serializable {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(name + " " + type.toString());
+		if (type.equals(Type.CHAR)) {
+			sb.append(String.format("(%d)",charLen));
+		}
 		if (constraints.size() > 0) {
 			sb.append(" CHECK(");
 			for (Constraint c : constraints) {

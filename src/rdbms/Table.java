@@ -19,10 +19,6 @@ public class Table implements Serializable {
 	List<ForeignKey> fks;
 	Rows rows;
 
-	public static void dropEverything() {
-		Database.tables.clear();
-	}
-
 	class ForeignKey implements Serializable {
 		Attribute domesticAttribute;
 		Table foreignTable;

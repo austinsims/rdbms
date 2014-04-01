@@ -15,7 +15,7 @@ public class SQLInsertTest {
 	public void setUp() throws Exception {
 		myOut = new ByteArrayOutputStream();
 		System.setOut(new PrintStream(myOut));
-		Table.dropEverything();
+		Database.clear();
 	}
 
 	

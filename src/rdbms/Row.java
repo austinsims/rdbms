@@ -50,7 +50,7 @@ public class Row implements Serializable {
 		if (element.getType() != attr.getType())
 			throw new SchemaViolationException("The value " + element + " does not match the attribute type at index " + index + ", which is " + element.getType());
 		if (!attr.checkConstraints(element))
-			throw new SchemaViolationException("The value " + element + "does not meet the domain constraints for " + attr + ": " + attr.constraints);
+			throw new SchemaViolationException("Error: Domain constraint violation!");
 		values[index] = element;
 	}
 	
