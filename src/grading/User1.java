@@ -49,6 +49,14 @@ public class User1 {
 		myOut.reset();
 
 		SQLParser.parse("HELP DESCRIBE STUDENT;");
+		assertLinesEqual(
+				"snum -- INT -- PRIMARY KEY\n"+
+				"sname -- CHAR(30) \n"+
+				"dep -- INT -- FOREIGN KEY REFERENCES DEPARTMENT (deptid)\n"+
+				"slevel -- CHAR(10) -- slevel = 'JR' OR slevel = 'SR' OR slevel = 'SO' OR slevel = 'FR'\n"+
+				"age -- INT -- age > 16\n",
+				myOut.toString());
+		myOut.reset();
 
 		// Don't bother with comparing result for help on commands
 		SQLParser.parse("HELP CREATE TABLE;");
@@ -338,6 +346,8 @@ public class User1 {
 		assertLinesEqual("Sorry, but you must be an admin user to do that.", myOut.toString());
         myOut.reset();
 
+        RDBMS.save();
+        
 	}
 
 }

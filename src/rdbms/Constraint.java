@@ -16,7 +16,12 @@ public class Constraint implements Serializable {
 	}
 	
 	public String toString() {
-		return op + " " + referenceValue;
+		switch (referenceValue.getType()) {
+		case CHAR:
+			return String.format("%s '%s'", op, referenceValue);
+		default:
+			return op + " " + referenceValue;
+		}
 	}
 	
 	@Override

@@ -16,7 +16,7 @@ public class Table implements Serializable {
 	private Attributes schema;
 	private Attributes subschema;
 	Attributes pk;
-	List<ForeignKey> fks;
+	ForeignKeys fks;
 	Rows rows;
 
 	public Table(String name, Attributes schema, Attributes pk) {
@@ -26,7 +26,7 @@ public class Table implements Serializable {
 			throw new IllegalArgumentException("All elements of pk " + pk
 					+ " must be contained in the attributes list " + schema + "");
 		this.pk = pk;
-		this.fks = new LinkedList<ForeignKey>();
+		this.fks = new ForeignKeys();
 		this.rows = new Rows(schema);
 	}
 
@@ -187,28 +187,55 @@ public class Table implements Serializable {
 	}
 
 	public String toString() {
-		StringBuilder s = new StringBuilder();
+		StringBuilder attrSB = new StringBuilder();
 	
 		// List attributes
-		s.append(String.format("%s ( ", name));
 		for (Attribute a : visibleSchema()) {
-			s.append(a.toString() + ", ");
+			
+			// Name
+			attrSB.append(a.getName());
+			
+			// Type
+			attrSB.append(" -- ");
+			switch (a.getType()) {
+			case CHAR:
+				attrSB.append(String.format("CHAR(%d)", a.charLen));
+				break;
+			case DECIMAL:
+				attrSB.append("DECIMAL");
+				break;
+			case INT:
+				attrSB.append("INT");
+			}
+			
+			// [Primary Key Component]
+			if (pk.contains(a))
+				attrSB.append(" -- PRIMARY KEY");
+			
+			// [Domain Constraints]
+			if (a.constraints.size() > 0) {
+				attrSB.append(" -- ");
+				for (int i=0; i < a.constraints.size(); i++) {
+					Constraint c = a.constraints.get(i);
+					attrSB.append(a.getName() + " ");
+					attrSB.append(c);
+					if (i < a.constraints.size() - 1) {
+						attrSB.append(" " + a.constraints.getOperator().toString()+ " ");
+					}
+				}
+			}
+			
+			// [Foreign Key References]
+			ForeignKey fk;
+			if ((fk = fks.getByDomesticAttr(a)) != null) {
+				attrSB.append(" -- ");
+				attrSB.append(String.format("FOREIGN KEY REFERENCES %s (%s)", fk.foreignTable.getName(), fk.foreignAttribute.getName()));
+			}
+			
+			attrSB.append("\n");
 		}
 	
-		// Show primary key
-		s.append("PRIMARY KEY (");
-		for (Attribute a : pk)
-			s.append(a.getName() + ", ");
-		s.append(")");
-	
-		s.append(" )");
-		
-		// Show foreign key constraints
-		for (ForeignKey fk : this.fks ) {
-			s.append(String.format(" FOREIGN KEY %s REFERENCES %s (%s) ", fk.domesticAttribute.getName(), fk.foreignTable.getName(), fk.foreignAttribute.getName()));
-		}
-	
-		return s.toString();
+		return attrSB.toString();
 	}
 
 	// Get the subschema if there is one, or just return the schema if none is set

@@ -1,5 +1,7 @@
 package grading;
 
+import static rdbms.Assert.assertLinesEqual;
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
@@ -29,6 +31,11 @@ public class User2 {
 	@Test
 	public void helpDescribe() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("HELP DESCRIBE STUDENT;");
+		assertLinesEqual(
+				"sname -- CHAR(30)\n" + 
+				"slevel -- CHAR(10) -- slevel = 'JR' OR slevel = 'SR' OR slevel = 'SO' OR slevel = 'FR'\n",
+				myOut.toString());
+		myOut.reset();
 		SQLParser.parse("HELP DESCRIBE DEPARTMENT;");
 		SQLParser.parse("HELP DESCRIBE FACULTY;");
 	}

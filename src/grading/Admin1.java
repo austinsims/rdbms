@@ -15,8 +15,8 @@ import rdbms.InvalidSQLException;
 import rdbms.PermissionException;
 import rdbms.RDBMS;
 import rdbms.SQLParser;
-import static org.junit.Assert.assertEquals;
-import static rdbms.Assert.assertLinesEqual;
+import static org.junit.Assert.*;
+import static rdbms.Assert.*;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class Admin1 {
@@ -383,7 +383,14 @@ public class Admin1 {
 		myOut.reset();
 
 	    SQLParser.parse("HELP DESCRIBE CLASS;");
-
+	    assertTrue(linesEqualIgnoreOrder(
+	    		"cname -- CHAR(30) -- PRIMARY KEY\n"+
+	    		"meets_at -- CHAR(30)\n"+
+	    		"room -- CHAR(10)\n"+
+	    		"faculty_id -- INT -- FOREIGN KEY REFERENCES FACULTY (fid)\n",
+	    				myOut.toString()));
+	    
+	    
 	    RDBMS.save();
         
 	}

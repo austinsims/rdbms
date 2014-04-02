@@ -9,13 +9,18 @@ public class Constraints extends ArrayList<Constraint> {
 	private static final long serialVersionUID = 2288558564426955955L;
 
 	enum Operator {
-		AND, OR,
+		AND, 
+		OR,
 	}
 
 	Operator operator = Operator.AND; // default to and
 
 	public void setOperator(Operator op) {
 		this.operator = op;
+	}
+	
+	public Operator getOperator() {
+		return operator;
 	}
 	
 	public Constraints(Operator op) {
@@ -43,7 +48,4 @@ public class Constraints extends ArrayList<Constraint> {
 		return false;
 	}
 
-	public Operator getOperator() {
-		return operator;
-	}
 }
