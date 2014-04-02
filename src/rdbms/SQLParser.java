@@ -400,6 +400,9 @@ public class SQLParser {
 				}
 				break;
 			case "DROP":
+				if (Database.getLoggedInUser().getType().equals(User.Type.B))
+					throw new PermissionException("Error: Authorization failure!");
+					
 				String whatToDrop = tokens.next();
 
 				if (whatToDrop.equals("TABLE")) {
@@ -558,6 +561,8 @@ public class SQLParser {
 				System.out.println("Tuple inserted successfully");
 				break;
 			case "DELETE":
+				if (Database.getLoggedInUser().getType().equals(User.Type.B))
+					throw new PermissionException("Error: Authorization failure!");
 				String whatToDelete = tokens.next();
 				if (whatToDelete.equals("FROM")) {
 					Table tableToDeleteFrom = Database.tables.get(tokens.next());

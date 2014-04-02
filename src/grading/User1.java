@@ -38,14 +38,8 @@ public class User1 {
 	@Test
 	public void test() throws InvalidSQLException, PermissionException, PermissionException {
 
-		Set<String> expected = new HashSet<String>();
-		expected.addAll(Arrays.asList(new String[] {"DEPARTMENT", "FACULTY", "STUDENT", "CLASS", "ENROLLED"}));
 		SQLParser.parse("HELP TABLES;");
-		// Make sure every table is printed, but order doesn't matter
-		String[] tables = myOut.toString().split("\n");
-		Set<String> actual = new HashSet<String>();
-		actual.addAll(Arrays.asList(tables));
-		assertEquals(expected, actual);
+		assertTrue(linesEqualIgnoreOrder("DEPARTMENT\nFACULTY\nSTUDENT\nCLASS\nENROLLED", myOut.toString()));
 		myOut.reset();
 
 		SQLParser.parse("HELP DESCRIBE STUDENT;");
