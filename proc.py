@@ -9,12 +9,12 @@ s = re.sub(r'[ ]{2,}','\t',s)
 
 out = open(sys.argv[1], 'w')
 lines = s.split('\n')
-lines = filter(lambda a: a != '',lines)
+lines = list(filter(lambda a: a != '',lines))
 i = 0
 for line in lines:
     out.write('"' + line + r'\n"')
     if i == len(lines) - 1:
-	out.write(',')
+        out.write(',')
     else:
         out.write('+')
     out.write('\n')

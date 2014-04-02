@@ -55,7 +55,6 @@ public class Admin2 {
         myOut.reset();
         
         // TODO: Create subschema on GRADE then drop it, just to test drop
-        // TODO: Why is DROP TABLE GRADE not actually dropping the table?  GRADE.table gets deleted, but HELP TABLES below still displays GRADE...
 
 		SQLParser.parse("DROP TABLE GRADE;");
         assertTrue(linesEqualIgnoreOrder(
