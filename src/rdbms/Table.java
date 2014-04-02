@@ -190,8 +190,8 @@ public class Table implements Serializable {
 		StringBuilder attrSB = new StringBuilder();
 	
 		// List attributes
-		for (Attribute a : visibleSchema()) {
-			
+		for (int i=0; i<visibleSchema().size(); i++) {
+			Attribute a = visibleSchema().get(i);
 			// Name
 			attrSB.append(a.getName());
 			
@@ -215,11 +215,11 @@ public class Table implements Serializable {
 			// [Domain Constraints]
 			if (a.constraints.size() > 0) {
 				attrSB.append(" -- ");
-				for (int i=0; i < a.constraints.size(); i++) {
-					Constraint c = a.constraints.get(i);
+				for (int j=0; j < a.constraints.size(); j++) {
+					Constraint c = a.constraints.get(j);
 					attrSB.append(a.getName() + " ");
 					attrSB.append(c);
-					if (i < a.constraints.size() - 1) {
+					if (j < a.constraints.size() - 1) {
 						attrSB.append(" " + a.constraints.getOperator().toString()+ " ");
 					}
 				}
@@ -232,7 +232,8 @@ public class Table implements Serializable {
 				attrSB.append(String.format("FOREIGN KEY REFERENCES %s (%s)", fk.foreignTable.getName(), fk.foreignAttribute.getName()));
 			}
 			
-			attrSB.append("\n");
+			if (i < visibleSchema().size() - 1)
+				attrSB.append(System.getProperty("line.separator"));
 		}
 	
 		return attrSB.toString();

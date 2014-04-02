@@ -372,23 +372,23 @@ public class Admin1 {
         assertLinesEqual("The requested schema does not contain the attribute fffid", myOut.toString());
         myOut.reset();
 
-        Set<String> expected = new HashSet<String>();
-		expected.addAll(Arrays.asList(new String[] {"DEPARTMENT", "FACULTY", "STUDENT", "CLASS", "ENROLLED"}));
-		SQLParser.parse("HELP TABLES;");
-		// Make sure every table is printed, but order doesn't matter
-		String[] tables = myOut.toString().split("\n");
-		Set<String> actual = new HashSet<String>();
-		actual.addAll(Arrays.asList(tables));
-		assertEquals(expected, actual);
-		myOut.reset();
+        SQLParser.parse("HELP TABLES;");
+        assertTrue(linesEqualIgnoreOrder(
+        		"DEPARTMENT"+ENDL+
+        		"FACULTY"+ENDL+
+        		"STUDENT"+ENDL+
+        		"CLASS"+ENDL+
+        		"ENROLLED"+ENDL,
+        		myOut.toString()));
+        myOut.reset();
 
 	    SQLParser.parse("HELP DESCRIBE CLASS;");
 	    assertTrue(linesEqualIgnoreOrder(
-	    		"cname -- CHAR(30) -- PRIMARY KEY\n"+
-	    		"meets_at -- CHAR(30)\n"+
-	    		"room -- CHAR(10)\n"+
-	    		"faculty_id -- INT -- FOREIGN KEY REFERENCES FACULTY (fid)\n",
-	    				myOut.toString()));
+	    		"cname -- CHAR(30) -- PRIMARY KEY"+ENDL+
+	    		"meets_at -- CHAR(30)"+ENDL+
+	    		"room -- CHAR(10)"+ENDL+
+	    		"faculty_id -- INT -- FOREIGN KEY REFERENCES FACULTY (fid)"+ENDL,
+	    		myOut.toString()));
 	    
 	    
 	    RDBMS.save();

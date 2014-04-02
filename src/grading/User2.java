@@ -34,29 +34,36 @@ public class User2 {
 	@Test
 	public void test() throws InvalidSQLException, PermissionException {
 		SQLParser.parse("HELP TABLES;");
-		assertTrue(linesEqualIgnoreOrder("DEPARTMENT\nFACULTY\nSTUDENT\nCLASS\nENROLLED\nGRADE", myOut.toString()));
+		assertTrue(linesEqualIgnoreOrder(
+				"DEPARTMENT"+ENDL+
+				"FACULTY"+ENDL+
+				"STUDENT"+ENDL+
+				"CLASS"+ENDL+
+				"ENROLLED"+ENDL+
+				"GRADE"+ENDL,
+				myOut.toString()));
         myOut.reset();
 
 		SQLParser.parse("HELP DESCRIBE STUDENT;");
 		assertLinesEqual(
-				"sname -- CHAR(30)\n" + 
-				"slevel -- CHAR(10) -- slevel = 'JR' OR slevel = 'SR' OR slevel = 'SO' OR slevel = 'FR'\n",
+				"sname -- CHAR(30)"+ENDL + 
+				"slevel -- CHAR(10) -- slevel = 'JR' OR slevel = 'SR' OR slevel = 'SO' OR slevel = 'FR'"+ENDL,
 				myOut.toString());
 		myOut.reset();
 
 		SQLParser.parse("HELP DESCRIBE DEPARTMENT;");
 		assertLinesEqual(
-				"dname -- CHAR(30)\n"+
-				"location -- CHAR(30)\n",
+				"dname -- CHAR(30)"+ENDL+
+				"location -- CHAR(30)"+ENDL,
 				myOut.toString()
 				);
         myOut.reset();
 
 		SQLParser.parse("HELP DESCRIBE FACULTY;");
 		assertLinesEqual(
-				"fid -- INT -- PRIMARY KEY -- fid != 0\n"+
-				"fname -- CHAR(30)\n"+
-				"dept -- INT -- FOREIGN KEY REFERENCES DEPARTMENT (deptid)\n",
+				"fid -- INT -- PRIMARY KEY -- fid != 0"+ENDL+
+				"fname -- CHAR(30)"+ENDL+
+				"dept -- INT -- FOREIGN KEY REFERENCES DEPARTMENT (deptid)"+ENDL,
 				myOut.toString()
 				);
         myOut.reset();
@@ -71,25 +78,25 @@ public class User2 {
 
 		SQLParser.parse("SELECT * FROM GRADE;");
 		assertTrue(linesEqualIgnoreOrder(
-				"stu_num	classname	grade\n"+
-				"14181	ENG400	A\n"+
-				"80161	ENG400	B\n",
+				"stu_num	classname	grade"+ENDL+
+				"14181	ENG400	A"+ENDL+
+				"80161	ENG400	B"+ENDL,
 				myOut.toString()));
         myOut.reset();
 
 		SQLParser.parse("SELECT * FROM STUDENT;");
 		assertTrue(linesEqualIgnoreOrder(
-				"sname	slevel\n"+
-				"Jack	SO\n"+
-				"Smith	FR\n"+
-				"Banks	SR\n"+
-				"M.Lee	SO	\n"+
-				"Bale	JR\n"+
-				"Lim	SR\n"+
-				"Sharon	FR\n"+
-				"Johnson	JR\n"+
-				"E.Cho	JR\n"+
-				"Angin	SR	\n",
+				"sname	slevel"+ENDL+
+				"Jack	SO"+ENDL+
+				"Smith	FR"+ENDL+
+				"Banks	SR"+ENDL+
+				"M.Lee	SO	"+ENDL+
+				"Bale	JR"+ENDL+
+				"Lim	SR"+ENDL+
+				"Sharon	FR"+ENDL+
+				"Johnson	JR"+ENDL+
+				"E.Cho	JR"+ENDL+
+				"Angin	SR	"+ENDL,
 				myOut.toString()));
         myOut.reset();
 

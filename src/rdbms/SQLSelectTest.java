@@ -1,6 +1,6 @@
 package rdbms;
 import static org.junit.Assert.assertEquals;
-import static rdbms.Assert.assertLinesEqual;
+import static rdbms.Assert.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -65,7 +65,7 @@ public class SQLSelectTest {
 		myOut.reset();
 		
 		SQLParser.parse("SELECT ename FROM employee;");
-		assertLinesEqual("ename\nJohn", myOut.toString());
+		assertLinesEqual("ename"+ENDL+"John", myOut.toString());
 	}
 	
 	@Test
@@ -96,7 +96,7 @@ public class SQLSelectTest {
 		myOut.reset();
 
 		SQLParser.parse("SELECT * FROM employee;");
-		assertLinesEqual("ename	eloc\nJack	Chicago", myOut.toString());
+		assertLinesEqual("ename	eloc"+ENDL+"Jack	Chicago", myOut.toString());
 		
 		myOut.reset();
 
@@ -106,12 +106,12 @@ public class SQLSelectTest {
 		myOut.reset();
 
 		SQLParser.parse("SELECT * FROM location;");
-		assertLinesEqual("lname	lsales\nChicago	5000000", myOut.toString());
+		assertLinesEqual("lname	lsales"+ENDL+"Chicago	5000000", myOut.toString());
 
 		myOut.reset();
 		
 		SQLParser.parse("SELECT ename, lsales FROM employee, location WHERE eloc = lname;");
-		assertLinesEqual("ename	lsales\nJack	5000000", myOut.toString());
+		assertLinesEqual("ename	lsales"+ENDL+"Jack	5000000", myOut.toString());
 
 	}
 
