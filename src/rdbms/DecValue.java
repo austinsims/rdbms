@@ -36,6 +36,25 @@ public class DecValue extends Value {
 	
 	@Override
 	public int hashCode() {
-		return Double.valueOf(value).hashCode();
+		final int prime = 31;
+		int result = 1;
+		long temp;
+		temp = Double.doubleToLongBits(value);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof DecValue))
+			return false;
+		DecValue other = (DecValue) obj;
+		if (Double.doubleToLongBits(value) != Double.doubleToLongBits(other.value))
+			return false;
+		return true;
 	}
 }

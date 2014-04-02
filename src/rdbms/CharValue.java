@@ -37,6 +37,26 @@ public class CharValue extends Value {
 	
 	@Override
 	public int hashCode() {
-		return value.hashCode();
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((value == null) ? 0 : value.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof CharValue))
+			return false;
+		CharValue other = (CharValue) obj;
+		if (value == null) {
+			if (other.value != null)
+				return false;
+		} else if (!value.equals(other.value))
+			return false;
+		return true;
 	}
 }

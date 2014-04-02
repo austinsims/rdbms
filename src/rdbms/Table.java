@@ -131,25 +131,58 @@ public class Table implements Serializable {
 		
 	}
 
-	public boolean equals(Object o) {
-		Table other;
-		try {
-			other = (Table) o;
-		} catch (ClassCastException e) {
-			return false;
-		}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((fks == null) ? 0 : fks.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((pk == null) ? 0 : pk.hashCode());
+		result = prime * result + ((rows == null) ? 0 : rows.hashCode());
+		result = prime * result + ((schema == null) ? 0 : schema.hashCode());
+		result = prime * result + ((subschema == null) ? 0 : subschema.hashCode());
+		return result;
+	}
 
-		if (!this.name.equals(other.name))
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
 			return false;
-		if (!this.schema.equals(other.schema))
+		if (!(obj instanceof Table))
 			return false;
-		if (!this.pk.equals(other.pk))
+		Table other = (Table) obj;
+		if (fks == null) {
+			if (other.fks != null)
+				return false;
+		} else if (!fks.equals(other.fks))
 			return false;
-		if (!this.fks.equals(other.fks))
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
 			return false;
-		if (!this.rows.equals(other.rows))
+		if (pk == null) {
+			if (other.pk != null)
+				return false;
+		} else if (!pk.equals(other.pk))
 			return false;
-
+		if (rows == null) {
+			if (other.rows != null)
+				return false;
+		} else if (!rows.equals(other.rows))
+			return false;
+		if (schema == null) {
+			if (other.schema != null)
+				return false;
+		} else if (!schema.equals(other.schema))
+			return false;
+		if (subschema == null) {
+			if (other.subschema != null)
+				return false;
+		} else if (!subschema.equals(other.subschema))
+			return false;
 		return true;
 	}
 

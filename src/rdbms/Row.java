@@ -8,7 +8,6 @@ import java.util.Arrays;
 public class Row implements Serializable {
 	Attributes schema;
 	Value[] values;
-	int colPos = 0;
 	
 	public Row (Attributes schema) { 
 		this.schema = schema;
@@ -115,20 +114,21 @@ public class Row implements Serializable {
 	}
 	
 	@Override
-	public boolean equals(Object other) {
-		Row o;
-		try {
-			o = (Row) other;
-		} catch (ClassCastException e) {
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
 			return false;
-		}
-		
-		if (!schema.equals(o.schema)) return false;
-		
-		for (int i=0; i<values.length; i++) {
-			if (!values[i].equals(o.values[i])) return false;
-		}
-		
+		if (!(obj instanceof Row))
+			return false;
+		Row other = (Row) obj;
+		if (schema == null) {
+			if (other.schema != null)
+				return false;
+		} else if (!schema.equals(other.schema))
+			return false;
+		if (!Arrays.equals(values, other.values))
+			return false;
 		return true;
 	}
 	
@@ -156,11 +156,13 @@ public class Row implements Serializable {
 		return Arrays.toString(values);
 	}
 	
+	@Override
 	public int hashCode() {
-		int hashCode = 0;
-		for (Value v : values)
-			hashCode += v.hashCode();
-		return hashCode;
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((schema == null) ? 0 : schema.hashCode());
+		result = prime * result + Arrays.hashCode(values);
+		return result;
 	}
 
 }
