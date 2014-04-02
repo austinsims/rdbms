@@ -349,7 +349,7 @@ public class SQLParser {
 				} else if (whatToCreate.equals("USER")) {
 					// Check user permissions
 					if (!loggedInUser.getType().equals(User.Type.ADMIN))
-						throw new PermissionException("You must be an admin user to do that.");
+						throw new PermissionException("Sorry, but you must be an admin user to do that.");
 
 					// Create user
 					String username = tokens.next();
@@ -498,12 +498,17 @@ public class SQLParser {
 				} // if (whereClause)
 
 				Rows result = Database.select(selectedAttributeNames, selectedTableNames, cond);
-
-				// Print table header
-				System.out.println(result.schema.tableHeader());
-				// Print rows
-				for (Row r : result)
-					System.out.println(r.tableRow());
+				
+				if (result.size() > 0) {
+					// Print table header
+					System.out.println(result.schema.tableHeader());
+					// Print rows
+					for (Row r : result)
+						System.out.println(r.tableRow());
+				} else {
+					// Print empty line if there are no results.
+					System.out.println();
+				}
 
 				break;
 			case "INSERT":
@@ -592,6 +597,8 @@ public class SQLParser {
 				if (!tokens.next().equals("SET"))
 					throw new InvalidSQLException("UPDATE table_name must be followed by SET");
 
+				boolean updateWhereClause = false;
+				
 				Map<Attribute, Value> updates = new HashMap<Attribute, Value>();
 				boolean hasNextAttrVal = true;
 				while (hasNextAttrVal) {
@@ -612,23 +619,36 @@ public class SQLParser {
 						break;
 					case "WHERE":
 						hasNextAttrVal = false;
+						updateWhereClause = true;
+						break;
+					case ";":
+						hasNextAttrVal = false;
 						break;
 					default:
 						throw new InvalidSQLException("Update list attr1 = val1 ... not followed by WHERE clause");
 					}
 				}
 
-				// Parse WHERE clause (condition list)
-				// TODO: enforce foreign key constraints
-				Conditions updateConditions = parseConditionList(tokens, updateTables);
+				Conditions updateConditions;
+				if (updateWhereClause) {
+					// Parse WHERE clause (condition list)
+					updateConditions = parseConditionList(tokens, updateTables);
+				} else {
+					// Create empty Conditions that will pass every row
+					updateConditions = new Conditions();
+				}
+				
 				Rows rowsToUpdate = tableToUpdate.rows.getAll(updateConditions);
 				for (Row row : rowsToUpdate) {
 					for (Attribute attr : updates.keySet()) {
 						row.set(attr, updates.get(attr));
 					}
 				}
-
-				System.out.printf("%d rows affected", rowsToUpdate.size());
+								
+				if (rowsToUpdate.size() == 1)
+					System.out.printf("1 row affected");
+				else
+					System.out.printf("%d rows affected", rowsToUpdate.size());
 
 				break;
 			case "HELP":

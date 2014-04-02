@@ -269,49 +269,73 @@ public class User1 {
 						"14181	ENG400\n",
 				myOut.toString()));
         myOut.reset();
-		if (true) return;		
-		SQLParser.parse("SELECT fname FROM FACULTY WHERE fid=1111;");
 
+		SQLParser.parse("SELECT fname FROM FACULTY WHERE fid=1111;");
+		assertEquals("\n", myOut.toString());
         myOut.reset();
 
 		SQLParser.parse("UPDATE DEPARTMENT SET location='WLafayette' WHERE deptid=11 OR deptid=22;");
-
+		assertLinesEqual("2 rows affected", myOut.toString());
         myOut.reset();
 
 		SQLParser.parse("UPDATE STUDENT SET age=21,sname='Smith' WHERE sname='A.Smith';");
-
+		assertLinesEqual("1 row affected", myOut.toString());
         myOut.reset();
 
 		SQLParser.parse("SELECT * FROM CLASS;");
-
+		assertTrue(linesEqualIgnoreOrder(
+				"cname	meets_at	room	faculty_id\n"+
+						"ENG400	8:30	U003	1040\n"+
+						"ENG320	10:30	R128	1040\n"+
+						"COM10000	12:30	L108	1040\n"+
+						"ME30800	12:00	R128	1020\n"+
+						"CS448	11:00	R128	1010\n"+
+						"HIS21000	11:00	L108	1040\n"+
+						"MATH27500	15:30	L108	1050\n"+
+						"STAT11000	13:00	R128	1050\n"+
+						"PHYS10000	14:00	U003	1010\n",
+				myOut.toString()
+				));
         myOut.reset();
 
 		SQLParser.parse("UPDATE CLASS SET meets_at='12:00';");
-
+		assertLinesEqual("9 rows affected", myOut.toString());
         myOut.reset();
 
 		SQLParser.parse("SELECT * FROM CLASS;");
-
+		assertTrue(linesEqualIgnoreOrder(
+				"cname	meets_at	room	faculty_id\n"+
+						"ENG400	12:00	U003	1040\n"+
+						"ENG320	12:00	R128	1040\n"+
+						"COM10000	12:00	L108	1040\n"+
+						"ME30800	12:00	R128	1020\n"+
+						"CS448	12:00	R128	1010\n"+
+						"HIS21000	12:00	L108	1040\n"+
+						"MATH27500	12:00	L108	1050\n"+
+						"STAT11000	12:00	R128	1050\n"+
+						"PHYS10000	12:00	U003	1010\n", 
+				myOut.toString()
+				));
         myOut.reset();
 
 		SQLParser.parse("CREATE TABLE GRADE(stu_num INT, classname CHAR(30), grade CHAR(2), PRIMARY KEY(stu_num, classname), FOREIGN KEY (stu_num) REFERENCES STUDENT(snum), FOREIGN KEY (classname) REFERENCES CLASS(cname));");
-
+		assertLinesEqual("Table created successfully", myOut.toString());
         myOut.reset();
 
 		SQLParser.parse("INSERT INTO GRADE VALUES('ENG400', 14181, 'A');");
-
+		assertLinesEqual("The value 'ENG400' cannot be interpreted as an integer", myOut.toString());
         myOut.reset();
 
 		SQLParser.parse("INSERT INTO GRADE VALUES(14181, 'ENG400', 'A');");
-
+		assertLinesEqual("Tuple inserted successfully", myOut.toString());
         myOut.reset();
 
 		SQLParser.parse("INSERT INTO GRADE VALUES(80161,'ENG400', 'B');");
-
+		assertLinesEqual("Tuple inserted successfully", myOut.toString());
         myOut.reset();
 
 		SQLParser.parse("CREATE USER user10 User-A;");
-
+		assertLinesEqual("Sorry, but you must be an admin user to do that.", myOut.toString());
         myOut.reset();
 
 	}
