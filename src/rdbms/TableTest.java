@@ -25,8 +25,7 @@ public class TableTest {
 	Row malibu, explorer;
 
 	@Before
-	public void setUp() throws InvalidAttributeException,
-			SchemaViolationException, PermissionException {
+	public void setUp() throws RDBMSException {
 		Database.clear();
 		
 		schema = new Attributes();
@@ -193,12 +192,11 @@ public class TableTest {
 	
 	/**
 	 * Make sure rows with duplicate PKs are not allowed
-	 * @throws SchemaViolationException 
-	 * @throws PermissionException 
+	 * @throws RDBMSException 
 	 */
 
 	@Test
-	public void noDuplicatePKs() throws SchemaViolationException, PermissionException {
+	public void noDuplicatePKs() throws RDBMSException {
 		Row malibuDupe = new Row(malibu);
 		// Change something but leave the PK the same
 		malibuDupe.set(schema.get("color"), new CharValue("Orange"));
@@ -212,7 +210,7 @@ public class TableTest {
 	}
 	
 	@Test
-	public void testSimpleJoin() throws InvalidAttributeException, SchemaViolationException, PermissionException {
+	public void testSimpleJoin() throws RDBMSException {
 		Attributes employeeSchema = new Attributes();
 		Attribute ename = new Attribute("ename", Attribute.Type.CHAR, 50);
 		Attribute elocation = new Attribute("elocation", Attribute.Type.CHAR, 50);

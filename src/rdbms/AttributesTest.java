@@ -12,8 +12,16 @@ public class AttributesTest {
 		Attributes attrs = new Attributes();
 		String name = "whatever";
 		attrs.add(new Attribute(name, Attribute.Type.INT));
+		
 		assertTrue(attrs.contains(name));
 		assertFalse(attrs.contains("SomethingElse"));
+		
+		
+		Attribute a1 = new Attribute("hello", Attribute.Type.INT);
+		Attribute a2 = new Attribute("hello", Attribute.Type.INT);
+		attrs.add(a1);
+		assertEquals(a1,a2);
+		assertTrue(attrs.contains(a2));
 	}
 
 	@Test

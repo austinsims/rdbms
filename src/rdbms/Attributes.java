@@ -23,7 +23,7 @@ public class Attributes extends LinkedHashSet<Attribute> {
 	public Attribute get(String attrName) throws SchemaViolationException {
 		for (Attribute a : this) 
 			if (a.getName().equals(attrName)) return a;
-		throw new SchemaViolationException("Does not contain " + attrName);
+		throw new SchemaViolationException("The requested schema does not contain the attribute " + attrName);
 	}
 	
 	public Attribute get(int index) {

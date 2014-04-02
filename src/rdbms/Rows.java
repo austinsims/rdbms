@@ -48,8 +48,10 @@ public class Rows extends LinkedHashSet<Row> {
 	}
 	
 	public Rows cross(Rows other) throws SchemaViolationException {
+		/*
 		if (schema.containsASameNameAttr(other.schema))
 			throw new SchemaViolationException("You may not join tables that contain attributes of the same name.");
+			*/
 		
 		Attributes crossSchema = new Attributes();
 		crossSchema.addAll(this.schema);

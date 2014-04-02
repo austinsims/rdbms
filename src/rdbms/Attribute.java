@@ -94,12 +94,28 @@ public class Attribute implements Serializable {
 				alphaSet.contains(attr.charAt(0)); // first char is alphanumeric
 	}
 	
-	public boolean equals(Attribute other) {
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		
+		Attribute other;
+		if ( !(o instanceof Attribute) ) return false;
+		other = (Attribute) o;
+		
 		if (this.type != other.type) return false;
 		if (!(this.name.equals(other.name))) return false;
 		if (this.type == Attribute.Type.CHAR && this.charLen != other.charLen) return false;
+		if (!this.constraints.equals(other.constraints)) return false;
 	
 		return true;
+	}
+	
+	@Override
+	public int hashCode() {
+		int result = HashCodeUtil.SEED;
+		result = HashCodeUtil.hash(result, type);
+		result = HashCodeUtil.hash(result, name);
+		result = HashCodeUtil.hash(result, constraints);
+		return result;
 	}
 	
 	// TODO: Constraints
@@ -108,6 +124,7 @@ public class Attribute implements Serializable {
 		if (type == Type.CHAR) {
 			if (((CharValue) v).value.length() > charLen) return false;
 		}
+				
 		return true;
 	}
 }

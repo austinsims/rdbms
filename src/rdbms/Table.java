@@ -19,21 +19,6 @@ public class Table implements Serializable {
 	List<ForeignKey> fks;
 	Rows rows;
 
-	class ForeignKey implements Serializable {
-		Attribute domesticAttribute;
-		Table foreignTable;
-		Attribute foreignAttribute;
-
-		ForeignKey(Attribute domesticAttribute, Table foreignTable, Attribute foreignAttribute) throws SchemaViolationException {
-			this.domesticAttribute = domesticAttribute;
-			this.foreignTable = foreignTable;
-			Attributes foreignPk = foreignTable.pk;
-			if (foreignPk.size() != 1 || !foreignAttribute.equals(foreignPk.get(0)))
-				throw new SchemaViolationException("Foreign keys may only be specified on a single-attribute primary key.");
-			this.foreignAttribute = foreignAttribute;
-		}
-	}
-
 	public Table(String name, Attributes schema, Attributes pk) {
 		this.name = name;
 		this.schema = schema;
@@ -64,7 +49,7 @@ public class Table implements Serializable {
 
 	}
 
-	public boolean insert(Row newRow) throws SchemaViolationException, PermissionException {
+	public boolean insert(Row newRow) throws RDBMSException {
 		if (Database.getLoggedInUser().getType().equals(User.Type.B))
 			throw new PermissionException("Sorry, users of type User-B may not insert tuples");
 		
@@ -87,9 +72,14 @@ public class Table implements Serializable {
 			fkCond.add(fk.foreignAttribute, Operator.EQUAL, domesticValue);
 			List<String> selectedAttributes = Arrays.asList(new String[] {fk.foreignAttribute.getName()});
 			List<String> selectedTables = Arrays.asList(new String[] {fk.foreignTable.getName()});
-			Rows results = Database.select(selectedAttributes, selectedTables, fkCond);
+			Rows results;
+			try {
+				results = Database.select(selectedAttributes, selectedTables, fkCond);
+			} catch (RDBMSException e) {
+				throw new RDBMSException("Error: Foreign key constraints violated!");
+			}
 			if (results.size() != 1) {
-				throw new SchemaViolationException("Could not find strictly one tuple in " + fk.foreignTable + " that has a value " + domesticValue + " for " + fk.foreignAttribute);
+				throw new SchemaViolationException("Could not find strictly one tuple in " + fk.foreignTable.getName() + " that has a value " + domesticValue + " for " + fk.foreignAttribute);
 			}
 		}
 		
@@ -107,7 +97,7 @@ public class Table implements Serializable {
 		this.subschema = subschema;
 	}
 
-	public boolean insertAll(Row... all) throws SchemaViolationException, PermissionException {
+	public boolean insertAll(Row... all) throws RDBMSException {
 		boolean success = true;
 		for (Row row : all) {
 			success = success && insert(row);
@@ -161,18 +151,6 @@ public class Table implements Serializable {
 			return false;
 
 		return true;
-	}
-
-	/**
-	 * Drop table and delete its file stored on disk
-	 * @param table
-	 */
-	public static boolean drop(Table table) {
-		// TODO: search for tables that have foreign key references to this one; if any, do not delete and issue an error!
-		File tableFile = new File(table.getName() + ".table");
-		boolean success = tableFile.delete();
-		Database.tables.remove(table);
-		return success;
 	}
 
 	public String toString() {

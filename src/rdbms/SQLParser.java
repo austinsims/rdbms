@@ -384,9 +384,10 @@ public class SQLParser {
 						Attribute subattr = schema.get(subattrName);
 						subschema.add(subattr);
 
-						if (tokens.hasNext(","))
+						if (tokens.hasNext(",")) {
+							tokens.next();
 							hasNextAttr = true;
-						else if (tokens.hasNext(";"))
+						} else if (tokens.hasNext(";"))
 							hasNextAttr = false;
 						else
 							throw new InvalidSQLException("Malformed attribute list");
@@ -407,7 +408,7 @@ public class SQLParser {
 					if (!tokens.next().equals(";"))
 						throw new InvalidSQLException("Missing semicolon");
 
-					if (Table.drop(Database.tables.get(tableToDrop))) {
+					if (Database.dropTable(Database.tables.get(tableToDrop))) {
 						System.out.println("Table dropped successfully");
 					} else {
 						System.err.println("Sorry, could not delete table file on disk.  Is it in use by another process?");
@@ -761,6 +762,7 @@ public class SQLParser {
 	}
 
 	private static Conditions parseConditionList(Scanner tokens, List<String> selectedTables) throws InvalidSQLException, SchemaViolationException {
+
 		Conditions cond = new Conditions();
 
 		boolean and = false;
@@ -777,7 +779,7 @@ public class SQLParser {
 
 			// If the next token begins with alphanumeric, it's an attribute
 			// name
-			if (tokens.hasNext("[a-zA-Z]+")) {
+			if (tokens.hasNext("[a-zA-Z_]+")) {
 				String rhsName = tokens.next();
 				Attribute rhs = findAttrInTables(selectedTables, rhsName);
 				cond.add(lhs, op, rhs);

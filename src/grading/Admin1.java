@@ -1,6 +1,9 @@
 package grading;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -12,6 +15,7 @@ import rdbms.InvalidSQLException;
 import rdbms.PermissionException;
 import rdbms.RDBMS;
 import rdbms.SQLParser;
+import static org.junit.Assert.assertEquals;
 import static rdbms.Assert.assertLinesEqual;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -64,7 +68,7 @@ public class Admin1 {
 		
 		// 7
 		SQLParser.parse("CREATE TABLE GRADE(student_num INT, class_name CHAR(30), PRIMARY KEY(student_num, class_name), FOREIGN KEY(student_num) REFERENCES STUDENT(num), FOREIGN KEY(class_name) REFERENCES CLASS(cname));");
-		assertLinesEqual("Does not contain num", myOut.toString());
+		assertLinesEqual("The requested schema does not contain the attribute num", myOut.toString());
 		myOut.reset();
 		
 		// 8
@@ -332,8 +336,56 @@ public class Admin1 {
 	    assertLinesEqual("Tuple inserted successfully", myOut.toString());
 	    myOut.reset();
 	    
-	    RDBMS.save();
+	    SQLParser.parse("CREATE USER user1 User-A;");
+	    assertLinesEqual("User created successfully", myOut.toString());
+	    myOut.reset();
 
+	    SQLParser.parse("CREATE USER user2 User-B;");
+	    assertLinesEqual("User created successfully", myOut.toString());
+	    myOut.reset();
+
+	    SQLParser.parse("DELETE USER user3;");
+	    assertLinesEqual("The user user3 does not exist.", myOut.toString());
+	    myOut.reset();
+	    
+	    SQLParser.parse("CREATE USER user4 User-A;");
+        assertLinesEqual("User created successfully", myOut.toString());
+	    myOut.reset();
+
+	    SQLParser.parse("DELETE USER user4;");
+        assertLinesEqual("User deleted successfully", myOut.toString());
+        myOut.reset();
+
+	    SQLParser.parse("CREATE SUBSCHEMA STUDENT sname,slevel;");
+        assertLinesEqual("Subschema created successfully", myOut.toString());
+        myOut.reset();
+
+	    SQLParser.parse("CREATE SUBSCHEMA DEPARTMENT dname,location;");
+        assertLinesEqual("Subschema created successfully", myOut.toString());
+        myOut.reset();
+
+	    SQLParser.parse("CREATE SUBSCHEMA GRADE cname;");
+        assertLinesEqual("The table named GRADE does not exist", myOut.toString());
+        myOut.reset();
+
+	    SQLParser.parse("CREATE SUBSCHEMA FACULTY fffid,fname;");
+        assertLinesEqual("The requested schema does not contain the attribute fffid", myOut.toString());
+        myOut.reset();
+
+        Set<String> expected = new HashSet<String>();
+		expected.addAll(Arrays.asList(new String[] {"DEPARTMENT", "FACULTY", "STUDENT", "CLASS", "ENROLLED"}));
+		SQLParser.parse("HELP TABLES;");
+		// Make sure every table is printed, but order doesn't matter
+		String[] tables = myOut.toString().split("\n");
+		Set<String> actual = new HashSet<String>();
+		actual.addAll(Arrays.asList(tables));
+		assertEquals(expected, actual);
+		myOut.reset();
+
+	    SQLParser.parse("HELP DESCRIBE CLASS;");
+
+	    RDBMS.save();
+        
 	}
 
 }

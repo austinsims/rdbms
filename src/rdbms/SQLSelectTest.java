@@ -21,7 +21,7 @@ public class SQLSelectTest {
 	}
 	
 	@Test
-	public void basic() throws InvalidAttributeException, SchemaViolationException, InvalidSQLException, PermissionException  {
+	public void basic() throws RDBMSException  {
         String[] expected = new String[] {"thing", "hello"};
 
 

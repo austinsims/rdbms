@@ -12,7 +12,7 @@ public class SQLUpdateTest {
 	}
 
 	@Test
-	public void testUpdate() throws InvalidAttributeException, SchemaViolationException, InvalidSQLException, PermissionException {
+	public void testUpdate() throws RDBMSException {
 		Attributes schema = new Attributes();
 		schema.add(new Attribute("name", Attribute.Type.CHAR, 50));
 		schema.add(new Attribute("city", Attribute.Type.CHAR, 50));

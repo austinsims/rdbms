@@ -19,11 +19,12 @@ public class Database {
 	static Set<User> users;
 
 	static User admin = new User("admin", User.Type.ADMIN);
-	static User loggedInUser = admin; // for testing purposes
+	static User loggedInUser; // for testing purposes
 
 	static {
 		tables = new Tables();
 		users = new HashSet<User>();
+		loggedInUser = admin;
 	}
 
 	public static boolean addUser(User newUser) {
@@ -85,7 +86,7 @@ public class Database {
 		// project to allowed attributes only
 		Rows crossProduct = first.rows.project(first.visibleSchema());
 		for (int i = 1; i < selectedTables.size(); i++) {
-			Table next = tables.get(selectedTables.get(1));
+			Table next = tables.get(selectedTables.get(i));
 			crossProduct = crossProduct.cross(next.rows.project(next.visibleSchema()));
 		}
 
@@ -118,6 +119,25 @@ public class Database {
 
 	public static void clear() {
 		tables.clear();
+	}
+
+	/**
+	 * Drop table and delete its file stored on disk
+	 * @param tabletoDrop
+	 */
+	public static boolean dropTable(Table tabletoDrop) throws SchemaViolationException {
+		// TODO: search for tables that have foreign key references to this one; if any, do not delete and issue an error!
+		for (Table table : tables) {
+			for (ForeignKey fk : table.fks) {
+				if (fk.foreignTable.equals(tabletoDrop))
+					throw new SchemaViolationException(String.format("%s cannot be dropped because %s contains a foreign key reference to it.", tabletoDrop.getName(), table.getName()));
+			}
+		}
+		
+		File tableFile = new File(tabletoDrop.getName() + ".table");
+		boolean success = tableFile.delete();
+		tables.remove(tabletoDrop);
+		return success;
 	}
 
 }

@@ -76,7 +76,7 @@ public class Row implements Serializable {
 	}
 	
 	public Value get(Attribute attr) throws SchemaViolationException {
-		if (!schema.contains(attr)) throw new SchemaViolationException(String.format("The schema of this row (%s) does not contain a value of type %s.", schema, attr));
+		if (!schema.contains(attr)) throw new SchemaViolationException(String.format("Error: The schema of this row does not contain a value of type %s.", schema, attr));
 		int index = schema.indexOf(attr);
 		return values[index];
 	}
