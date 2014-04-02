@@ -1,0 +1,13 @@
+CS448 - Project 2 
+Author: Austin Sims
+Login: sims4
+Email: sims4@purdue.edu
+
+Usage: ./minidbms username [file.sql]
+
+The driver, minidbms, runs the program in interactive mode if given a
+username only.  It can also run a file of SQL statements if given the
+path as a second argument.  It does not take input from stdin.
+
+If turnin messed up the permissions, minidbms is a shell script;
+'chmod +x minidbms' to fix.

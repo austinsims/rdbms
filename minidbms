@@ -1,0 +1,8 @@
+#!/bin/sh
+if [ "$#" -eq 1 ]; then
+    java -cp bin rdbms.RDBMS $1
+elif [ "$#" -eq 2 ]; then
+    java -cp bin rdbms.RDBMS $1 $2
+else
+    echo "Usage: ./minidbms username [file.sql]"
+fi
