@@ -123,20 +123,24 @@ public class Database {
 
 	/**
 	 * Drop table and delete its file stored on disk
-	 * @param tabletoDrop
+	 * @param tableToDrop
 	 */
-	public static boolean dropTable(Table tabletoDrop) throws SchemaViolationException {
+	public static boolean dropTable(Table tableToDrop) throws SchemaViolationException {
 		// TODO: search for tables that have foreign key references to this one; if any, do not delete and issue an error!
 		for (Table table : tables) {
 			for (ForeignKey fk : table.fks) {
-				if (fk.foreignTable.equals(tabletoDrop))
-					throw new SchemaViolationException(String.format("%s cannot be dropped because %s contains a foreign key reference to it.", tabletoDrop.getName(), table.getName()));
+				if (fk.foreignTable.equals(tableToDrop))
+					throw new SchemaViolationException(String.format("%s cannot be dropped because %s contains a foreign key reference to it.", tableToDrop.getName(), table.getName()));
 			}
 		}
 		
-		File tableFile = new File(tabletoDrop.getName() + ".table");
-		boolean success = tableFile.delete();
-		tables.remove(tabletoDrop);
+		File tableFile = new File(tableToDrop.getName() + ".table");
+		Table wtf = tables.get(tableToDrop.getName());
+		boolean ugh = wtf.equals(tableToDrop);
+		boolean fuckMe = wtf.hashCode() == tableToDrop.hashCode();
+		boolean removedInstance = tables.remove(tableToDrop);
+		boolean deletedFile = tableFile.delete();
+		boolean success = removedInstance && deletedFile;
 		return success;
 	}
 

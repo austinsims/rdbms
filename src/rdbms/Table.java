@@ -187,6 +187,10 @@ public class Table implements Serializable {
 	}
 
 	public String toString() {
+		return getName();
+	}
+	
+	public String description() {
 		StringBuilder attrSB = new StringBuilder();
 	
 		// List attributes

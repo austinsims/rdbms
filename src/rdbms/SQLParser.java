@@ -694,7 +694,7 @@ public class SQLParser {
 					String tableToDescribeName = tokens.next();
 					Table tableToDescribe = Database.tables.get(tableToDescribeName);
 					// TODO: Use exact format from example??
-					System.out.println(tableToDescribe);
+					System.out.println(tableToDescribe.description());
 					if (!tokens.next().equals(";"))
 						throw new InvalidSQLException("Missing semicolon");
 					break;

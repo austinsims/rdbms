@@ -3,12 +3,10 @@ package rdbms;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.HashSet;
-
-import sun.security.util.ObjectIdentifier;
+import java.util.LinkedList;
 
 @SuppressWarnings("unused")
-public class Tables extends HashSet<Table> {
+public class Tables extends LinkedList<Table> {
 	/**
 	 * 
 	 */

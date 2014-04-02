@@ -282,6 +282,13 @@ public class TableTest {
 		in.close();
 	}
 
+	@Test
+	public void testEquals() throws RDBMSException {
+		Table carDup = new Table("car", schema, pk);
+		carDup.insert(malibu);
+		carDup.insert(explorer);
+		assertEquals(car,carDup);
+	}
 
 }
 
