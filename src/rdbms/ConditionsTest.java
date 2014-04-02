@@ -101,6 +101,43 @@ public class ConditionsTest {
 		assertFalse(isSquare.test(green));
 		
 	}
+	
+	@Test
+	public void testOr() throws InvalidAttributeException, SchemaViolationException {
+		Attributes schema = new Attributes();
+		Attribute age = new Attribute("age", Attribute.Type.INT);
+		Attribute weight = new Attribute("weight", Attribute.Type.INT);
+		
+		schema.add(age);
+		schema.add(weight);
+		
+		Conditions oldOrFat = new Conditions();
+		oldOrFat.setMode(Conditions.Mode.OR);
+		oldOrFat.add(new ValueCondition(age, Operator.GREATER, new IntValue(60)));
+		oldOrFat.add(new ValueCondition(weight, Operator.GREATER, new IntValue(200)));
+		
+		Row humphry = new Row(schema);
+		humphry.set(age, new IntValue(25));
+		humphry.set(weight, new IntValue(240));
+		
+		Row gladys = new Row(schema);
+		gladys.set(age, new IntValue(90));
+		gladys.set(weight, new IntValue(110));
+		
+		Row anna = new Row(schema);
+		anna.set(age, new IntValue(18));
+		anna.set(weight, new IntValue(120));
+		
+		Row otis = new Row(schema);
+		otis.set(age, new IntValue(62));
+		otis.set(weight, new IntValue(210));
+		
+		assertTrue(oldOrFat.test(humphry));
+		assertTrue(oldOrFat.test(gladys));
+		assertTrue(oldOrFat.test(otis));
+		assertFalse(oldOrFat.test(anna));
+				
+	}
 
 }
 

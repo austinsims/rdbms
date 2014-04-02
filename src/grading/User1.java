@@ -255,15 +255,21 @@ public class User1 {
 		SQLParser.parse("INSERT INTO ENROLLED VALUES(14181,'ENG400');");
 		assertLinesEqual("Tuple inserted successfully", myOut.toString());
         myOut.reset();
-		if (true) return;		
-		SQLParser.parse("INSERT INTO ENROLLED VALUES(14181,'CS448');");
 
+		SQLParser.parse("INSERT INTO ENROLLED VALUES(14181,'CS448');");
+		assertLinesEqual("Error: Duplicate entry!", myOut.toString());
         myOut.reset();
 
 		SQLParser.parse("SELECT * FROM ENROLLED WHERE student_num=14181 OR class_name='CS448' OR student_num=1111;");
-
+		assertTrue(linesEqualIgnoreOrder(
+				"student_num	class_name\n"+
+						"14181	CS448\n"+
+						"14181	MATH27500\n"+
+						"14181	STAT11000\n"+
+						"14181	ENG400\n",
+				myOut.toString()));
         myOut.reset();
-
+		if (true) return;		
 		SQLParser.parse("SELECT fname FROM FACULTY WHERE fid=1111;");
 
         myOut.reset();

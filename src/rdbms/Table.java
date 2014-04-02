@@ -63,7 +63,7 @@ public class Table implements Serializable {
 			i++;
 		}
 		if (rows.getAll(cond).size() > 0)
-			throw new SchemaViolationException("This table already has a row with the PK = " + newRowPKValues);
+			throw new SchemaViolationException("Error: Duplicate entry!");
 
 		// Check foreign key constraints.
 		for (ForeignKey fk : fks) {

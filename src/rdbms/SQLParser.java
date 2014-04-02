@@ -816,6 +816,11 @@ public class SQLParser {
 				throw new InvalidSQLException("Syntax error in WHERE clause");
 			}
 		}
+		if (and) {
+			cond.setMode(Conditions.Mode.AND);
+		} else {
+			cond.setMode(Conditions.Mode.OR);
+		}
 		return cond;
 	}
 
