@@ -39,16 +39,22 @@ public class User1 {
 	public void test() throws InvalidSQLException, PermissionException, PermissionException {
 
 		SQLParser.parse("HELP TABLES;");
-		assertTrue(linesEqualIgnoreOrder("DEPARTMENT\nFACULTY\nSTUDENT\nCLASS\nENROLLED", myOut.toString()));
+		assertTrue(linesEqualIgnoreOrder(
+				"DEPARTMENT"+ENDL+
+				"FACULTY"+ENDL+
+				"STUDENT"+ENDL+
+				"CLASS"+ENDL+
+				"ENROLLED"+ENDL,
+				myOut.toString()));
 		myOut.reset();
 
 		SQLParser.parse("HELP DESCRIBE STUDENT;");
 		assertLinesEqual(
-				"snum -- INT -- PRIMARY KEY\n"+
-				"sname -- CHAR(30) \n"+
-				"dep -- INT -- FOREIGN KEY REFERENCES DEPARTMENT (deptid)\n"+
-				"slevel -- CHAR(10) -- slevel = 'JR' OR slevel = 'SR' OR slevel = 'SO' OR slevel = 'FR'\n"+
-				"age -- INT -- age > 16\n",
+				"snum -- INT -- PRIMARY KEY"+ENDL+
+				"sname -- CHAR(30) "+ENDL+
+				"dep -- INT -- FOREIGN KEY REFERENCES DEPARTMENT (deptid)"+ENDL+
+				"slevel -- CHAR(10) -- slevel = 'JR' OR slevel = 'SR' OR slevel = 'SO' OR slevel = 'FR'"+ENDL+
+				"age -- INT -- age > 16"+ENDL,
 				myOut.toString());
 		myOut.reset();
 
@@ -69,23 +75,23 @@ public class User1 {
 	
 		SQLParser.parse("SELECT * FROM ENROLLED;");
 		assertLinesEqual(
-				"student_num	class_name\n" + 
-				"14181	CS448\n" +
-				"14181	MATH27500\n" +
-				"12341	ENG400\n" +
-				"12341	MATH27500\n" +
-				"80161	ENG400\n" +
-				"80161	ENG320\n" +
-				"80161	HIS21000\n" +
-				"80161	STAT11000\n" +
-				"14181	STAT11000\n" +
-				"12341	COM10000\n" +
-				"16711	ENG400\n" +
-				"16711	STAT11000\n" +
-				"12341	HIS21000\n" +
-				"57651	PHYS10000\n" +
-				"57651	ENG320\n" +
-				"57651	COM10000\n",
+				"student_num	class_name"+ENDL + 
+				"14181	CS448"+ENDL +
+				"14181	MATH27500"+ENDL +
+				"12341	ENG400"+ENDL +
+				"12341	MATH27500"+ENDL +
+				"80161	ENG400"+ENDL +
+				"80161	ENG320"+ENDL +
+				"80161	HIS21000"+ENDL +
+				"80161	STAT11000"+ENDL +
+				"14181	STAT11000"+ENDL +
+				"12341	COM10000"+ENDL +
+				"16711	ENG400"+ENDL +
+				"16711	STAT11000"+ENDL +
+				"12341	HIS21000"+ENDL +
+				"57651	PHYS10000"+ENDL +
+				"57651	ENG320"+ENDL +
+				"57651	COM10000"+ENDL,
 				myOut.toString());
 		myOut.reset();
 
@@ -99,146 +105,146 @@ public class User1 {
 		
 		SQLParser.parse("SELECT snum,sname FROM STUDENT;");
 		assertLinesEqual(
-                         "snum	sname\n" +
-                         "14181	Jack\n" +
-                         "16711	A.Smith\n" +
-                         "12341	Banks\n" +
-                         "37261	M.Lee\n" +
-                         "48291	Bale\n" +
-                         "57651	Lim\n" +
-                         "10191	Sharon\n" +
-                         "73571	Johnson\n" +
-                         "80161	E.Cho\n" +
-                         "80162	Angin\n",
+                         "snum	sname"+ENDL +
+                         "14181	Jack"+ENDL +
+                         "16711	A.Smith"+ENDL +
+                         "12341	Banks"+ENDL +
+                         "37261	M.Lee"+ENDL +
+                         "48291	Bale"+ENDL +
+                         "57651	Lim"+ENDL +
+                         "10191	Sharon"+ENDL +
+                         "73571	Johnson"+ENDL +
+                         "80161	E.Cho"+ENDL +
+                         "80162	Angin"+ENDL,
                          myOut.toString()
 				);
 		myOut.reset();
 				
 		SQLParser.parse("SELECT * FROM ENROLLED WHERE student_num=14181;");
 		assertLinesEqual(
-					"student_num	class_name\n"+
-					"14181	CS448\n"+
-					"14181	MATH27500\n"+
-					"14181	STAT11000\n",
+					"student_num	class_name"+ENDL+
+					"14181	CS448"+ENDL+
+					"14181	MATH27500"+ENDL+
+					"14181	STAT11000"+ENDL,
 					myOut.toString());
 		myOut.reset();
 				
 		SQLParser.parse("SELECT sname,cname,fname FROM STUDENT,CLASS,FACULTY,ENROLLED WHERE snum=student_num AND fid=faculty_id AND cname=class_name;");
 		assertTrue(linesEqualIgnoreOrder(
-				"sname	cname	fname\n"+
-						"Jack	CS448	Layton\n"+
-						"Jack	MATH27500	Mason\n"+
-						"Banks	ENG400	Boling\n"+
-						"Banks	MATH27500	Mason\n"+
-						"E.Cho	ENG400	Boling\n"+
-						"E.Cho	ENG320	Boling\n"+
-						"E.Cho	HIS21000	Boling\n"+
-						"E.Cho	STAT11000	Mason\n"+
-						"Jack	STAT11000	Mason\n"+
-						"Banks	COM10000	Boling\n"+
-						"A.Smith	ENG400	Boling\n"+
-						"A.Smith	STAT11000	Mason\n"+
-						"Banks	HIS21000	Boling\n"+
-						"Lim	PHYS10000	Layton\n"+
-						"Lim	ENG320	Boling\n"+
-						"Lim	COM10000	Boling\n",
+				"sname	cname	fname"+ENDL+
+						"Jack	CS448	Layton"+ENDL+
+						"Jack	MATH27500	Mason"+ENDL+
+						"Banks	ENG400	Boling"+ENDL+
+						"Banks	MATH27500	Mason"+ENDL+
+						"E.Cho	ENG400	Boling"+ENDL+
+						"E.Cho	ENG320	Boling"+ENDL+
+						"E.Cho	HIS21000	Boling"+ENDL+
+						"E.Cho	STAT11000	Mason"+ENDL+
+						"Jack	STAT11000	Mason"+ENDL+
+						"Banks	COM10000	Boling"+ENDL+
+						"A.Smith	ENG400	Boling"+ENDL+
+						"A.Smith	STAT11000	Mason"+ENDL+
+						"Banks	HIS21000	Boling"+ENDL+
+						"Lim	PHYS10000	Layton"+ENDL+
+						"Lim	ENG320	Boling"+ENDL+
+						"Lim	COM10000	Boling"+ENDL,
 						myOut.toString()));
 		myOut.reset();
 		
 		
 		SQLParser.parse("SELECT sname,cname FROM STUDENT,CLASS;");
 		assertTrue(linesEqualIgnoreOrder(
-				"sname	cname\n"+
-						"Jack	ENG400\n"+
-						"A.Smith	ENG400\n"+
-						"Banks	ENG400\n"+
-						"M.Lee	ENG400\n"+
-						"Bale	ENG400\n"+
-						"Lim	ENG400\n"+
-						"Sharon	ENG400\n"+
-						"Johnson	ENG400\n"+
-						"E.Cho	ENG400\n"+
-						"Angin	ENG400\n"+
-						"Jack	ENG320\n"+
-						"A.Smith	ENG320\n"+
-						"Banks	ENG320\n"+
-						"M.Lee	ENG320\n"+
-						"Bale	ENG320\n"+
-						"Lim	ENG320\n"+
-						"Sharon	ENG320\n"+
-						"Johnson	ENG320\n"+
-						"E.Cho	ENG320\n"+
-						"Angin	ENG320\n"+
-						"Jack	COM10000\n"+
-						"A.Smith	COM10000\n"+
-						"Banks	COM10000\n"+
-						"M.Lee	COM10000\n"+
-						"Bale	COM10000\n"+
-						"Lim	COM10000\n"+
-						"Sharon	COM10000\n"+
-						"Johnson	COM10000\n"+
-						"E.Cho	COM10000\n"+
-						"Angin	COM10000\n"+
-						"Jack	ME30800\n"+
-						"A.Smith	ME30800\n"+
-						"Banks	ME30800\n"+
-						"M.Lee	ME30800\n"+
-						"Bale	ME30800\n"+
-						"Lim	ME30800\n"+
-						"Sharon	ME30800\n"+
-						"Johnson	ME30800\n"+
-						"E.Cho	ME30800\n"+
-						"Angin	ME30800\n"+
-						"Jack	CS448\n"+
-						"A.Smith	CS448\n"+
-						"Banks	CS448\n"+
-						"M.Lee	CS448\n"+
-						"Bale	CS448\n"+
-						"Lim	CS448\n"+
-						"Sharon	CS448\n"+
-						"Johnson	CS448\n"+
-						"E.Cho	CS448\n"+
-						"Angin	CS448\n"+
-						"Jack	HIS21000\n"+
-						"A.Smith	HIS21000\n"+
-						"Banks	HIS21000\n"+
-						"M.Lee	HIS21000\n"+
-						"Bale	HIS21000\n"+
-						"Lim	HIS21000\n"+
-						"Sharon	HIS21000\n"+
-						"Johnson	HIS21000\n"+
-						"E.Cho	HIS21000\n"+
-						"Angin	HIS21000\n"+
-						"Jack	MATH27500\n"+
-						"A.Smith	MATH27500\n"+
-						"Banks	MATH27500\n"+
-						"M.Lee	MATH27500\n"+
-						"Bale	MATH27500\n"+
-						"Lim	MATH27500\n"+
-						"Sharon	MATH27500\n"+
-						"Johnson	MATH27500\n"+
-						"E.Cho	MATH27500\n"+
-						"Angin	MATH27500\n"+
-						"Jack	STAT11000\n"+
-						"A.Smith	STAT11000\n"+
-						"Banks	STAT11000\n"+
-						"M.Lee	STAT11000\n"+
-						"Bale	STAT11000\n"+
-						"Lim	STAT11000\n"+
-						"Sharon	STAT11000\n"+
-						"Johnson	STAT11000\n"+
-						"E.Cho	STAT11000\n"+
-						"Angin	STAT11000\n"+
-						"Jack	PHYS10000\n"+
-						"A.Smith	PHYS10000\n"+
-						"Banks	PHYS10000\n"+
-						"M.Lee	PHYS10000\n"+
-						"Bale	PHYS10000\n"+
-						"Lim	PHYS10000\n"+
-						"Sharon	PHYS10000\n"+
-						"Johnson	PHYS10000\n"+
-						"E.Cho	PHYS10000\n"+
-						"Angin	PHYS10000\n", 
+				"sname	cname"+ENDL+
+						"Jack	ENG400"+ENDL+
+						"A.Smith	ENG400"+ENDL+
+						"Banks	ENG400"+ENDL+
+						"M.Lee	ENG400"+ENDL+
+						"Bale	ENG400"+ENDL+
+						"Lim	ENG400"+ENDL+
+						"Sharon	ENG400"+ENDL+
+						"Johnson	ENG400"+ENDL+
+						"E.Cho	ENG400"+ENDL+
+						"Angin	ENG400"+ENDL+
+						"Jack	ENG320"+ENDL+
+						"A.Smith	ENG320"+ENDL+
+						"Banks	ENG320"+ENDL+
+						"M.Lee	ENG320"+ENDL+
+						"Bale	ENG320"+ENDL+
+						"Lim	ENG320"+ENDL+
+						"Sharon	ENG320"+ENDL+
+						"Johnson	ENG320"+ENDL+
+						"E.Cho	ENG320"+ENDL+
+						"Angin	ENG320"+ENDL+
+						"Jack	COM10000"+ENDL+
+						"A.Smith	COM10000"+ENDL+
+						"Banks	COM10000"+ENDL+
+						"M.Lee	COM10000"+ENDL+
+						"Bale	COM10000"+ENDL+
+						"Lim	COM10000"+ENDL+
+						"Sharon	COM10000"+ENDL+
+						"Johnson	COM10000"+ENDL+
+						"E.Cho	COM10000"+ENDL+
+						"Angin	COM10000"+ENDL+
+						"Jack	ME30800"+ENDL+
+						"A.Smith	ME30800"+ENDL+
+						"Banks	ME30800"+ENDL+
+						"M.Lee	ME30800"+ENDL+
+						"Bale	ME30800"+ENDL+
+						"Lim	ME30800"+ENDL+
+						"Sharon	ME30800"+ENDL+
+						"Johnson	ME30800"+ENDL+
+						"E.Cho	ME30800"+ENDL+
+						"Angin	ME30800"+ENDL+
+						"Jack	CS448"+ENDL+
+						"A.Smith	CS448"+ENDL+
+						"Banks	CS448"+ENDL+
+						"M.Lee	CS448"+ENDL+
+						"Bale	CS448"+ENDL+
+						"Lim	CS448"+ENDL+
+						"Sharon	CS448"+ENDL+
+						"Johnson	CS448"+ENDL+
+						"E.Cho	CS448"+ENDL+
+						"Angin	CS448"+ENDL+
+						"Jack	HIS21000"+ENDL+
+						"A.Smith	HIS21000"+ENDL+
+						"Banks	HIS21000"+ENDL+
+						"M.Lee	HIS21000"+ENDL+
+						"Bale	HIS21000"+ENDL+
+						"Lim	HIS21000"+ENDL+
+						"Sharon	HIS21000"+ENDL+
+						"Johnson	HIS21000"+ENDL+
+						"E.Cho	HIS21000"+ENDL+
+						"Angin	HIS21000"+ENDL+
+						"Jack	MATH27500"+ENDL+
+						"A.Smith	MATH27500"+ENDL+
+						"Banks	MATH27500"+ENDL+
+						"M.Lee	MATH27500"+ENDL+
+						"Bale	MATH27500"+ENDL+
+						"Lim	MATH27500"+ENDL+
+						"Sharon	MATH27500"+ENDL+
+						"Johnson	MATH27500"+ENDL+
+						"E.Cho	MATH27500"+ENDL+
+						"Angin	MATH27500"+ENDL+
+						"Jack	STAT11000"+ENDL+
+						"A.Smith	STAT11000"+ENDL+
+						"Banks	STAT11000"+ENDL+
+						"M.Lee	STAT11000"+ENDL+
+						"Bale	STAT11000"+ENDL+
+						"Lim	STAT11000"+ENDL+
+						"Sharon	STAT11000"+ENDL+
+						"Johnson	STAT11000"+ENDL+
+						"E.Cho	STAT11000"+ENDL+
+						"Angin	STAT11000"+ENDL+
+						"Jack	PHYS10000"+ENDL+
+						"A.Smith	PHYS10000"+ENDL+
+						"Banks	PHYS10000"+ENDL+
+						"M.Lee	PHYS10000"+ENDL+
+						"Bale	PHYS10000"+ENDL+
+						"Lim	PHYS10000"+ENDL+
+						"Sharon	PHYS10000"+ENDL+
+						"Johnson	PHYS10000"+ENDL+
+						"E.Cho	PHYS10000"+ENDL+
+						"Angin	PHYS10000"+ENDL, 
 				myOut.toString()));
 		myOut.reset();
 				
@@ -264,16 +270,16 @@ public class User1 {
 
 		SQLParser.parse("SELECT * FROM ENROLLED WHERE student_num=14181 OR class_name='CS448' OR student_num=1111;");
 		assertTrue(linesEqualIgnoreOrder(
-				"student_num	class_name\n"+
-						"14181	CS448\n"+
-						"14181	MATH27500\n"+
-						"14181	STAT11000\n"+
-						"14181	ENG400\n",
+				"student_num	class_name"+ENDL+
+						"14181	CS448"+ENDL+
+						"14181	MATH27500"+ENDL+
+						"14181	STAT11000"+ENDL+
+						"14181	ENG400"+ENDL,
 				myOut.toString()));
         myOut.reset();
 
 		SQLParser.parse("SELECT fname FROM FACULTY WHERE fid=1111;");
-		assertEquals("\n", myOut.toString());
+		assertEquals(""+ENDL, myOut.toString());
         myOut.reset();
 
 		SQLParser.parse("UPDATE DEPARTMENT SET location='WLafayette' WHERE deptid=11 OR deptid=22;");
@@ -286,16 +292,16 @@ public class User1 {
 
 		SQLParser.parse("SELECT * FROM CLASS;");
 		assertTrue(linesEqualIgnoreOrder(
-				"cname	meets_at	room	faculty_id\n"+
-						"ENG400	8:30	U003	1040\n"+
-						"ENG320	10:30	R128	1040\n"+
-						"COM10000	12:30	L108	1040\n"+
-						"ME30800	12:00	R128	1020\n"+
-						"CS448	11:00	R128	1010\n"+
-						"HIS21000	11:00	L108	1040\n"+
-						"MATH27500	15:30	L108	1050\n"+
-						"STAT11000	13:00	R128	1050\n"+
-						"PHYS10000	14:00	U003	1010\n",
+				"cname	meets_at	room	faculty_id"+ENDL+
+						"ENG400	8:30	U003	1040"+ENDL+
+						"ENG320	10:30	R128	1040"+ENDL+
+						"COM10000	12:30	L108	1040"+ENDL+
+						"ME30800	12:00	R128	1020"+ENDL+
+						"CS448	11:00	R128	1010"+ENDL+
+						"HIS21000	11:00	L108	1040"+ENDL+
+						"MATH27500	15:30	L108	1050"+ENDL+
+						"STAT11000	13:00	R128	1050"+ENDL+
+						"PHYS10000	14:00	U003	1010"+ENDL,
 				myOut.toString()
 				));
         myOut.reset();
@@ -306,16 +312,16 @@ public class User1 {
 
 		SQLParser.parse("SELECT * FROM CLASS;");
 		assertTrue(linesEqualIgnoreOrder(
-				"cname	meets_at	room	faculty_id\n"+
-						"ENG400	12:00	U003	1040\n"+
-						"ENG320	12:00	R128	1040\n"+
-						"COM10000	12:00	L108	1040\n"+
-						"ME30800	12:00	R128	1020\n"+
-						"CS448	12:00	R128	1010\n"+
-						"HIS21000	12:00	L108	1040\n"+
-						"MATH27500	12:00	L108	1050\n"+
-						"STAT11000	12:00	R128	1050\n"+
-						"PHYS10000	12:00	U003	1010\n", 
+				"cname	meets_at	room	faculty_id"+ENDL+
+						"ENG400	12:00	U003	1040"+ENDL+
+						"ENG320	12:00	R128	1040"+ENDL+
+						"COM10000	12:00	L108	1040"+ENDL+
+						"ME30800	12:00	R128	1020"+ENDL+
+						"CS448	12:00	R128	1010"+ENDL+
+						"HIS21000	12:00	L108	1040"+ENDL+
+						"MATH27500	12:00	L108	1050"+ENDL+
+						"STAT11000	12:00	R128	1050"+ENDL+
+						"PHYS10000	12:00	U003	1010"+ENDL, 
 				myOut.toString()
 				));
         myOut.reset();
