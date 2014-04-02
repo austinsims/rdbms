@@ -23,6 +23,7 @@ public class RDBMS {
 			filename = args[1];
 		} else {
 			System.err.println("Usage: java rdbms.RDBMS username [statements.sql]");
+			System.exit(1);
 		}
 
 		load();

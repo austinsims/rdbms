@@ -20,7 +20,6 @@ public class User5 {
 
 	@Before
 	public void setUp() throws Exception {
-		// TODO: Log in as user5
 		RDBMS.load();
 		User user5 = Database.getUser("user5");
 		if (user5 == null) fail("Could not get user object");
