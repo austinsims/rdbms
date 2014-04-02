@@ -570,14 +570,29 @@ public class SQLParser {
 					List<String> deletionTables = new ArrayList<String>();
 					deletionTables.add(tableToDeleteFrom.getName());
 
-					if (!tokens.next().equals("WHERE"))
-						throw new InvalidSQLException("DELETE FROM table_name must be followed by WHERE condition_list");
-
-					Conditions deletionConditions = parseConditionList(tokens, deletionTables);
+					// Either parse a condition list, or create a blank Conditions to select all.
+					Conditions deletionConditions;
+					String next = tokens.next();
+					switch (next) {
+					case "WHERE":
+						deletionConditions = parseConditionList(tokens, deletionTables);
+						break;
+					case ";":
+						deletionConditions = new Conditions();
+						break;
+					default:
+						throw new InvalidSQLException("Malformed DELETE statement");
+					}
 
 					Rows toDelete;
 					toDelete = tableToDeleteFrom.rows.getAll(deletionConditions);
 					tableToDeleteFrom.rows.removeAll(toDelete);
+					if (toDelete.size() == 1 ){
+						System.out.println("1 row affected");
+					} else {
+						System.out.printf("%d rows affected", toDelete.size());
+					}
+					
 				} else if (whatToDelete.equals("USER")) {
 					if (!loggedInUser.getType().equals(User.Type.ADMIN)) {
 						throw new PermissionException("Sorry, you must be an admin to delete users.");
